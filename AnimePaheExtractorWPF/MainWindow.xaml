@@ -42,16 +42,26 @@
                 <Border Padding="5">
                     <StackPanel>
                         <Grid>
-                            
+
                             <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" Text="Search Results" Foreground="White" FontSize="20" />
+                            <TextBlock Grid.Row="0" Text="Search Results" Foreground="White" FontSize="20" TextAlignment="Center" />
 
-                            <Grid Grid.Row="1">
-                                
+                            <Separator Grid.Row="1" HorizontalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                <Separator.Background>
+                                    <RadialGradientBrush>
+                                        <GradientStop Color="White" Offset="0.257"/>
+                                        <GradientStop Offset="1"/>
+                                    </RadialGradientBrush>
+                                </Separator.Background>
+                            </Separator>
+
+                            <Grid Grid.Row="2">
+                                <TextBlock Grid.Row="0" Text="None" Foreground="White" FontSize="20" TextAlignment="Left" />
                             </Grid>
                         </Grid>
                     </StackPanel>
