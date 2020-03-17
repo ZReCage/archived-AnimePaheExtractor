@@ -8,7 +8,7 @@ namespace AnimePaheExtractorWPF {
     class AnimepaheExtractor {
         //public static string SearchResults;
 
-        public static async void Search(string query) {
+        public static async Task<SearchResults> Search(string query) {
             query = query.Length > 0 ? query : "overlord";
 
             string url = "https://animepahe.com/api?m=search&l=8&q=" + query.Substring(0, query.Length > 32 ? 32 : query.Length);
@@ -20,13 +20,12 @@ namespace AnimePaheExtractorWPF {
             using (Stream stream = response.GetResponseStream())
                 using (StreamReader reader = new StreamReader(stream)) {
                     string _json = await reader.ReadToEndAsync();
-                    SearchResults _jsonob = JsonConvert.DeserializeObject<SearchResults>(_json);
+                    return JsonConvert.DeserializeObject<SearchResults>(_json);
                 }
         }
-
-        class SearchResults {
-            public int Total { get; set; }
-            public IList<Dictionary<string, string>> Data { get; set; }
-        }
+    }
+    class SearchResults {
+        public int Total { get; set; }
+        public IList<Dictionary<string, string>> Data { get; set; }
     }
 }
