@@ -1,0 +1,64 @@
+﻿<Window x:Class="AnimePaheExtractorWPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AnimePaheExtractorWPF"
+        mc:Ignorable="d"
+        Title="AnimePahe Extractor" Height="450" Width="800">
+    <Grid>
+        <Grid.Background>
+            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                <GradientStop Color="Black"/>
+                <GradientStop Color="#FF292929" Offset="1"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+        <Grid.OpacityMask>
+            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                <GradientStop Color="Black"/>
+                <GradientStop Color="#FF212121" Offset="1"/>
+            </LinearGradientBrush>
+        </Grid.OpacityMask>
+
+        <Border Padding="10">
+            <StackPanel>
+                <Border Padding="5">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </-->
+
+                        <TextBox x:Name="SearchText" Grid.Column="0" BorderThickness="2,2,2,2" FontSize="14" MaxLines="1" MaxLength="32" Margin="0 0 10 0"/>
+                        <Button x:Name="Search" Grid.Column="1" Content="Search" Click="Search_Click"/>
+                    </Grid>
+                </Border>
+                <Border Padding="5">
+                    <StackPanel>
+                        <Grid>
+                            
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Text="Search Results" Foreground="White" FontSize="20" />
+
+                            <Grid Grid.Row="1">
+                                
+                            </Grid>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Border>
+
+    </Grid>
+
+</Window>
