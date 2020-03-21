@@ -6,8 +6,6 @@ using System.Collections.Generic;
 
 namespace AnimePaheExtractorWPF {
     class AnimepaheExtractor {
-        //public static string SearchResults;
-
         public static async Task<SearchResults> Search(string query) {
             query = query.Length > 0 ? query : "overlord";
 

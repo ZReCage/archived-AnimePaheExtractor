@@ -1,0 +1,131 @@
+﻿<UserControl x:Class="AnimePaheExtractorWPF.SearchResult"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:AnimePaheExtractorWPF"
+             mc:Ignorable="d"
+             d:DesignHeight="140" d:DesignWidth="400" Foreground="#00000000">
+
+    <StackPanel>
+        <Border BorderThickness="3">
+            <Border.BorderBrush>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="#FFD5015B" Offset="0.671"/>
+                    <GradientStop Color="#00D5015B" Offset="0"/>
+                </LinearGradientBrush>
+            </Border.BorderBrush>
+            <Button
+                        x:Name="SearchResultDropDown"
+                        Click="SearchResultDropDown_Click"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        HorizontalContentAlignment="Left"
+                        VerticalContentAlignment="Center"
+                        
+                        
+                        Background="#19DDDDDD"
+                        BorderBrush="Transparent"
+                        Foreground="{x:Null}"
+                        InputScope="Xml" >
+                <Border BorderThickness="2">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel>
+                            <TextBlock
+                            Text="{Binding Title, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                Foreground="White"
+                                FontSize="24"
+                                FontFamily="Calibri"
+                    
+                                TextTrimming="CharacterEllipsis" FontStyle="Normal" />
+
+                            <StackPanel>
+                                <TextBlock
+                                    Foreground="Silver"
+                                    FontSize="12" 
+                                    FontFamily="Tahoma"
+                    
+                                    TextTrimming="CharacterEllipsis">
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}({0}) {1} episodes">
+                                            <Binding Path="Type"/>
+                                            <Binding Path="Episodes"/>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+
+                                <TextBlock
+                                    Text="{Binding Season, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+
+                                    Foreground="Silver"
+                                    FontSize="12"
+                                    FontFamily="Tahoma"
+                    
+                                    TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Button>
+        </Border>
+
+        <Grid Margin="5 5 5 0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            
+            <StackPanel x:Name="ExtractOptions" Visibility="Visible">
+                <RadioButton
+                    Content="Extract all episodes"
+                    Foreground="White"
+                
+                    Margin="0 0 0 5"/>
+
+                <RadioButton VerticalAlignment="Center" Margin="0 0 0 0">
+                    <StackPanel>
+                        <TextBlock
+                                Text="Extract a range of episodes"
+                                Foreground="White"
+                        
+                                VerticalAlignment="Center"
+                                Margin="0 0 0 5" />
+
+                        <StackPanel
+                                Grid.Row="1"
+                                Orientation="Horizontal" >
+                            <TextBlock
+                                    Text="From: "
+                                    Foreground="White"
+                            
+                                    VerticalAlignment="Center"
+                                    Margin="5 0 0 0" />
+                            <TextBox x:Name="FromTextBox" Text="0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="30" />
+
+                            <TextBlock
+                                    Text="To: "
+                                    Foreground="White"
+                            
+                                    VerticalAlignment="Center"
+                                    Margin="5 0 0 0" />
+                            <TextBox x:Name="ToTextBox" HorizontalAlignment="Left" VerticalAlignment="Top" Width="30"/>
+                        </StackPanel>
+                    </StackPanel>
+                </RadioButton>
+            </StackPanel>
+
+            <StackPanel
+                Grid.Column="1"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center">
+                <Button>
+                    <TextBlock Text="Start Extraction"/>
+                </Button>
+            </StackPanel>
+            
+        </Grid>
+    </StackPanel>
+</UserControl>

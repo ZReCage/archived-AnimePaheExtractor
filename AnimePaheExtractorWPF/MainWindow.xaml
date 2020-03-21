@@ -3,71 +3,81 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AnimePaheExtractorWPF"
         mc:Ignorable="d"
-        Title="AnimePahe Extractor" Height="450" Width="800">
-    <Grid>
-        <Grid.Background>
-            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                <GradientStop Color="Black"/>
-                <GradientStop Color="#FF292929" Offset="1"/>
-            </LinearGradientBrush>
-        </Grid.Background>
-        <Grid.OpacityMask>
-            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                <GradientStop Color="Black"/>
-                <GradientStop Color="#FF212121" Offset="1"/>
-            </LinearGradientBrush>
-        </Grid.OpacityMask>
+        Title="AnimePahe Extractor" Height="450" Width="800" Background="Transparent" Foreground="#00000000" BorderBrush="Red">
+    <Window.Resources>
+        
+    </Window.Resources>
 
-        <Border Padding="10">
-            <StackPanel>
-                <Border Padding="5">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="3*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
+    <Border BorderThickness="5">
+        <Grid>
+            <Grid.Background>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="Black"/>
+                    <GradientStop Color="#00292929" Offset="1"/>
+                </LinearGradientBrush>
+            </Grid.Background>
+            <Grid.OpacityMask>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="Black"/>
+                    <GradientStop Color="#FF212121" Offset="1"/>
+                </LinearGradientBrush>
+            </Grid.OpacityMask>
 
-                        <!-- Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="*"/>
-                        </-->
 
-                        <TextBox x:Name="SearchCriteria" Grid.Column="0" BorderThickness="2,2,2,2" FontSize="14" MaxLines="1" MaxLength="32" Margin="0 0 10 0" KeyUp="OnKeyUpHandler"/>
-                        <Button x:Name="Search" Grid.Column="1" Content="Search" Click="Search_Click"/>
-                    </Grid>
-                </Border>
-                <Border Padding="5">
-                    <StackPanel x:Name="spSearchResults">
-                        <!--Grid>
+            <TabControl
+                Background="{x:Null}"
+                BorderBrush="{x:Null}"
+                Foreground="{x:Null}"
+            
+                TabStripPlacement="Left"
+            >
 
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
+                <TabControl.Resources>
+                    <Style TargetType="TabItem">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="TabItem">
+                                    <Grid Name="Panel">
+                                        <ContentPresenter x:Name="ContentSite"
+                                        VerticalAlignment="Center"
+                                        HorizontalAlignment="Center"
+                                        ContentSource="Header"
+                                        Margin="20,10"
+                                        />
+                                    </Grid>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter TargetName="Panel" Property="Background" Value="#99ABCDEF" />
+                                            <Setter Property="Foreground" Value="Black"/>
+                                        </Trigger>
+                                        <Trigger Property="IsSelected" Value="False">
+                                            <Setter TargetName="Panel" Property="Background" Value="Transparent" />
+                                            <Setter Property="Foreground" Value="White"/>
+                                        </Trigger>
 
-                            <TextBlock Grid.Row="0" Text="Search Results" Foreground="White" FontSize="20" TextAlignment="Center" />
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </TabControl.Resources>
 
-                            <Separator Grid.Row="1" HorizontalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                                <Separator.Background>
-                                    <RadialGradientBrush>
-                                        <GradientStop Color="White" Offset="0.257"/>
-                                        <GradientStop Offset="1"/>
-                                    </RadialGradientBrush>
-                                </Separator.Background>
-                            </Separator>
+                <TabItem Header="Welcome">
+                    <TextBlock Text="Welcome!"/>
+                </TabItem>
+            
+                <TabItem Header="Search">
+                    <local:SearchMenu/>
+                </TabItem>
 
-                            <Grid Grid.Row="2">
-                                <TextBlock Grid.Row="0" Text="None" Foreground="White" FontSize="20" TextAlignment="Left" />
-                            </Grid>
-                        </Grid-->
-                    </StackPanel>
-                </Border>
-            </StackPanel>
-        </Border>
+                <TabItem Header="Download">
+                    <local:Download/>
 
-    </Grid>
+                </TabItem>
 
+            </TabControl>
+        </Grid>
+    </Border>
 </Window>
