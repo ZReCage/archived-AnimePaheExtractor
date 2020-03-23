@@ -43,10 +43,10 @@
             </Grid.ColumnDefinitions>
 
             <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto">
-                <StackPanel Grid.Column="0" x:Name="SearchResultsStackPanel"/>
+                <StackPanel x:Name="SearchResultsStackPanel"/>
             </ScrollViewer>
 
-            <Image Grid.Column="1" x:Name="SearchResultsImage" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0" Stretch="Uniform"/>
+            <Grid x:Name="SearchResultPreview" Grid.Column="1" />
         </Grid>
     </Grid>
 </UserControl>

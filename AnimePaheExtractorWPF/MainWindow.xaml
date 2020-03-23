@@ -27,6 +27,8 @@
 
 
             <TabControl
+                x:Name="MainMenuTabControl"
+                
                 Background="{x:Null}"
                 BorderBrush="{x:Null}"
                 Foreground="{x:Null}"
@@ -64,17 +66,20 @@
                     </Style>
                 </TabControl.Resources>
 
-                <TabItem Header="Welcome">
-                    <TextBlock Text="Welcome!"/>
+                <TabItem Header="Welcome" IsEnabled="False">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text=" Welcome!  " Foreground="White" FontSize="24"/>
+                            <Button Click="GoToSearch_Click" Content="Go to search" />
+                        </StackPanel>
+                    </StackPanel>
                 </TabItem>
-            
-                <TabItem Header="Search">
+
+                    <TabItem x:Name="SearchTabItem" Header="Search">
                     <local:SearchMenu/>
                 </TabItem>
 
-                <TabItem Header="Download">
-                    <local:Download/>
-
+                <TabItem x:Name="ExtractTabItem" Header="Extract" IsEnabled="False">
                 </TabItem>
 
             </TabControl>

@@ -25,6 +25,15 @@ namespace AnimePaheExtractorWPF {
             this.DataContext = searchResultCM;
         }
 
+        public string Id {
+            get { return searchResultCM.Id; }
+            set {
+                if (searchResultCM.Id != value) {
+                    searchResultCM.Id = value;
+                }
+            }
+        }
+
         public string Title {
             get { return searchResultCM.Title; }
             set {
@@ -59,17 +68,6 @@ namespace AnimePaheExtractorWPF {
                 }
             }
         }
-        public string Image {
-            get { return searchResultCM.Image; }
-            set {
-                if (searchResultCM.Image != value) {
-                    searchResultCM.Image = value;
-                }
-            }
-        }
-
-        private void SearchResultDropDown_Click(object sender, RoutedEventArgs e) {
-            ExtractOptions.Visibility = Visibility.Visible;
-        }
+        public BitmapImage Image { get; set; }
     }
 }

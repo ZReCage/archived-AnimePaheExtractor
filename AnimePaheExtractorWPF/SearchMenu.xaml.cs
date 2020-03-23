@@ -10,6 +10,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Diagnostics;
 
 namespace AnimePaheExtractorWPF {
     /// <summary>
@@ -17,10 +18,20 @@ namespace AnimePaheExtractorWPF {
     /// </summary>
     public partial class SearchMenu : UserControl {
         SearchResults Results;
-        public SearchMenu() {
-            InitializeComponent();
+        SearchResult LastSearchResultClicked;
 
+        Image Poster = new Image();
+
+        public SearchMenu() {
+            Grid.SetColumn(Poster, 1);
+            Poster.VerticalAlignment = VerticalAlignment.Center;
+            Poster.HorizontalAlignment = HorizontalAlignment.Center;
+            Poster.Margin = new Thickness(5, 0, 0, 0);
+            Poster.Stretch = Stretch.Uniform;
+
+            InitializeComponent();
         }
+
         private async void Search_Click(object sender, RoutedEventArgs e) {
             if (SearchCriteria.Text.Length > 3) {
 
@@ -35,22 +46,44 @@ namespace AnimePaheExtractorWPF {
                 IList < SearchResult > searchResultsList = new List<SearchResult>();
 
                 SearchResultsStackPanel.Children.Clear();
+                SearchResultPreview.Children.Clear();
+
                 if (Results.Total > 0) {
 
                     foreach (Dictionary<string, string> _data in Results.Data) {
 
-                        _data.TryGetValue("season", out string _season);
+                        _data.TryGetValue("id", out string _id);
                         _data.TryGetValue("title", out string _title);
                         _data.TryGetValue("type", out string _type);
                         _data.TryGetValue("episodes", out string _episodes);
-                        _data.TryGetValue("image", out string _image);
+                        _data.TryGetValue("season", out string _season);
+                        _data.TryGetValue("image", out string _uriImage);
 
                         SearchResult _r = new SearchResult {
+                            Id = _id,
                             Title = _title,
                             Type = _type,
                             Episodes = _episodes,
                             Season = _season,
-                            Image = _image
+                        };
+
+                        _r.SearchResultDropDown.Click += (s, e) => {
+                            _r.ExtractOptions.Visibility = Visibility.Visible;
+                            Poster.Source = _r.Image;
+
+                            if (LastSearchResultClicked != null && LastSearchResultClicked != _r)
+                                LastSearchResultClicked.ExtractOptions.Visibility = Visibility.Collapsed;
+
+                            LastSearchResultClicked = _r;
+                        };
+
+                        _r.StartExtraction.Click += (s, e) => {
+
+                            MainWindow.ReadyToExtract(new Dictionary<string, string>(){
+                                {"title", _r.Title },
+                                {"id", _r.Id },
+                            }, 1, Convert.ToInt32(_r.Episodes));
+
                         };
 
                         /*
@@ -67,17 +100,22 @@ namespace AnimePaheExtractorWPF {
                                 relevance
                          */
 
-                        BitmapImage _bitmap = new BitmapImage();
-                        _bitmap.BeginInit();
-                        _bitmap.UriSource = new Uri(_r.Image);
-                        _bitmap.EndInit();
-
-                        SearchResultsImage.Source = _bitmap;
+                        _r.Image = new BitmapImage();
+                        _r.Image.BeginInit();
+                        _r.Image.UriSource = new Uri(_uriImage);
+                        _r.Image.EndInit();
 
                         SearchResultsStackPanel.Children.Add(_r);
                     }
-                } else {
 
+                    SearchResultPreview.Children.Add(Poster);
+                } else {
+                    TextBlock _t = new TextBlock();
+                    _t.Text = ("Nothing were found");
+                    _t.FontSize = 32;
+                    _t.Foreground = Brushes.White;
+
+                    SearchResultsStackPanel.Children.Add(_t);
                 }
                 UpdateLayout();
             }

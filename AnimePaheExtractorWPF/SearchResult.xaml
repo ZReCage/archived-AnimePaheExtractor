@@ -17,7 +17,6 @@
             </Border.BorderBrush>
             <Button
                         x:Name="SearchResultDropDown"
-                        Click="SearchResultDropDown_Click"
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Stretch"
                         HorizontalContentAlignment="Left"
@@ -27,7 +26,7 @@
                         Background="#19DDDDDD"
                         BorderBrush="Transparent"
                         Foreground="{x:Null}"
-                        InputScope="Xml" >
+                        InputScope="Xml" ClickMode="Press" >
                 <Border BorderThickness="2">
                     <Grid>
                         <Grid.RowDefinitions>
@@ -72,20 +71,23 @@
             </Button>
         </Border>
 
-        <Grid Margin="5 5 5 0">
+        <Grid Margin="5 5 5 0" x:Name="ExtractOptions" Visibility="Collapsed">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             
-            <StackPanel x:Name="ExtractOptions" Visibility="Visible">
+            <StackPanel>
                 <RadioButton
+                    IsChecked="True"
                     Content="Extract all episodes"
                     Foreground="White"
                 
                     Margin="0 0 0 5"/>
 
-                <RadioButton VerticalAlignment="Center" Margin="0 0 0 0">
+                <RadioButton
+                    VerticalAlignment="Center"
+                    Margin="0 0 0 0" >
                     <StackPanel>
                         <TextBlock
                                 Text="Extract a range of episodes"
@@ -121,11 +123,10 @@
                 Grid.Column="1"
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center">
-                <Button>
-                    <TextBlock Text="Start Extraction"/>
+                <Button x:Name="StartExtraction">
+                    <TextBlock Text="Start Extraction" Margin="5 5 5 5" />
                 </Button>
             </StackPanel>
-            
         </Grid>
     </StackPanel>
 </UserControl>
