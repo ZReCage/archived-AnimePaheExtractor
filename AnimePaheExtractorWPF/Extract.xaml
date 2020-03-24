@@ -6,8 +6,13 @@
              xmlns:local="clr-namespace:AnimePaheExtractorWPF"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <StackPanel>
-        <Grid>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
@@ -16,5 +21,21 @@
             <TextBlock Grid.Column="0" Text="{Binding Title, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Foreground="White" FontSize="36" />
             <Button Grid.Column="1" Content="Let's go" Click="Button_Click"/>
         </Grid>
-    </StackPanel>
+        <ListView x:Name="ExtractListView" Grid.Row="1">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="#" Width="80"  DisplayMemberBinding="{Binding Path=Number}"/>
+                    <GridViewColumn Header="Quality" Width="120" DisplayMemberBinding="{Binding Path=Quality}"/>
+                    <GridViewColumn Header="FanSub" Width="200" DisplayMemberBinding="{Binding Path=FanSub}"/>
+                    <GridViewColumn Header="Progress" Width="120">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <ProgressBar Height="20" Width="100" Value="{Binding Path=Progress}" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </Grid>
 </UserControl>

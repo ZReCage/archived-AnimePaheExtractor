@@ -16,47 +16,23 @@ namespace AnimePaheExtractorWPF {
     /// Interaction logic for Download.xaml
     /// </summary>
     public partial class Extract : UserControl {
+        public static Serie CurrentSerie;
+        public static IList<Episode> CurrentEpisodes;
+
         ExtractorComponentModel extractorCM;
+
         public Extract() {
             InitializeComponent();
 
             extractorCM = new ExtractorComponentModel();
             this.DataContext = extractorCM;
-        }
 
-        #region SerieToDownload
-        private Dictionary<string, string> _serieToDownload;
-        public Dictionary<string, string> SerieToDownload {
-            get {
-                return _serieToDownload;
-            }
-
-            set {
-                _serieToDownload = value;
-
-                value.TryGetValue("title", out string _t);
-                extractorCM.Title = _t;
-
-                value.TryGetValue("id", out string _id);
-                extractorCM.Id = _id;
-            }
-        }
-        #endregion
-
-        private void Button_Click(object sender, RoutedEventArgs e, int from, int to) {
-            MainWindow.IsSearchTabEnabled = false;
+            extractorCM.Title = CurrentSerie.Title;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e) {
+            MainWindow.IsSearchTabEnabled = false;
 
-        }
-
-    }
-    public static partial class EpisodesReadyToExtract {
-        public static IList<Links> MultiLinksClass;
-        public class Links {
-            private IList<EpisodeExtractLink> linkList;
-            internal IList<EpisodeExtractLink> LinkList { get => linkList; set => linkList = value; }
         }
     }
 }

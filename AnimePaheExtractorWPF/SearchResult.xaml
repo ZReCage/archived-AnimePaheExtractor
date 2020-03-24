@@ -79,6 +79,7 @@
             
             <StackPanel>
                 <RadioButton
+                    x:Name="ExtractAllRadioButton"
                     IsChecked="True"
                     Content="Extract all episodes"
                     Foreground="White"
@@ -86,6 +87,7 @@
                     Margin="0 0 0 5"/>
 
                 <RadioButton
+                    x:Name="ExtractRangeRadioButton"
                     VerticalAlignment="Center"
                     Margin="0 0 0 0" >
                     <StackPanel>
@@ -105,7 +107,7 @@
                             
                                     VerticalAlignment="Center"
                                     Margin="5 0 0 0" />
-                            <TextBox x:Name="FromTextBox" Text="0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="30" />
+                            <TextBox x:Name="FromTextBox" Text="1" HorizontalAlignment="Left" VerticalAlignment="Top" Width="30" />
 
                             <TextBlock
                                     Text="To: "

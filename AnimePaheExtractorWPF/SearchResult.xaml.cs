@@ -46,8 +46,13 @@ namespace AnimePaheExtractorWPF {
             get { return searchResultCM.Episodes; }
             set {
                 if (searchResultCM.Episodes != value) {
-                    searchResultCM.Episodes = value;
-                    ToTextBox.Text = value;
+                    if(Convert.ToInt32(value) > 0) {
+                        searchResultCM.Episodes = value;
+                        ToTextBox.Text = value;
+                    } else {
+                        searchResultCM.Episodes = "?";
+                        ToTextBox.Text = "Unk";
+                    }
 
                 }
             }

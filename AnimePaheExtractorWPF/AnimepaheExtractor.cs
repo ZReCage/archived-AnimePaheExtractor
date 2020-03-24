@@ -84,36 +84,52 @@ namespace AnimePaheExtractorWPF {
             return JsonConvert.DeserializeObject<SearchResults>(_json);
         }
 
-        public static async Task<IList<string>> GetEpisodesList(int serieId, int from, int to) {
-            // First, get "session" parameter, this is the episode ID
-            int actualPage = 1;
-            string uri = "https://animepahe.com/" + $"api?m=release&id={serieId}&sort=episode_asc" + $"&page={actualPage}";
+        public static async Task<IList<Episode>> GetEpisodesList(int _serieId, Range _range) {
+            int actualPage = _range != null ? _range.From / 31 + 1 : 1;
+            int? lastPage = null;
 
-            string _request = await GetRequest(uri);
-            EpisodesList _eDeserialized = JsonConvert.DeserializeObject<EpisodesList>(_request);
+            IList<Episode> _episodes = new List<Episode>();
 
-            IList<string> _session = new List<string>();
+            do {
+                string uri = "https://animepahe.com/" + $"api?m=release&id={_serieId}&sort=episode_asc" + $"&page={actualPage}";
 
-            foreach (EpisodesList.EpisodeData data in _eDeserialized.Data)
-                _session.Add(data.Session);
+                string _request = await GetRequest(uri);
 
-            // Not done yet
-            // WC.DownloadFileAsync();
+                JObject jsonObject = JObject.Parse(_request);
+                if(lastPage == null)
+                    lastPage = Convert.ToInt32(jsonObject.SelectToken("last_page").ToString());
 
-            return _session;
+                foreach (JToken fundingSource in jsonObject.SelectTokens("data[*]")) {
+                    double _episodeNumber = Convert.ToDouble(fundingSource.SelectToken("episode").ToString());
+                    if (_range != null && _episodeNumber < _range.From)
+                        // If the episode number is lesser than "from" then continue
+                        continue;
+                    string _session = fundingSource.SelectToken("session").ToString();
+
+                    _episodes.Add(new Episode(_episodeNumber, _session));
+
+                    if (_range != null && _episodeNumber >= _range.To)
+                        // If the episode number is greater than "to" or equal, return
+                        return _episodes;
+                }
+
+                actualPage++;
+            } while (actualPage <= lastPage);
+
+            return _episodes;
         }
 
-        public static async Task<IList<EpisodeExtractLink>> GetEpisodeExtractLink(int serieId, string session) {
+        public static async Task<IList<EpisodeLinkData>> GetEpisodeLinksData(int serieId, string session) {
             // Request
             string uri = "https://animepahe.com/api?m=embed&p=kwik" + $"&id={serieId}" + $"&session={session}";
             string _request = await GetRequest(uri);
 
             try {
                 JObject jsonObject = JObject.Parse(_request);
-                IList<EpisodeExtractLink> episodeExtractLink = new List<EpisodeExtractLink>();
+                IList<EpisodeLinkData> episodeExtractLink = new List<EpisodeLinkData>();
 
                 foreach (JToken fundingSource in jsonObject.SelectTokens("$.*.*")) {
-                    EpisodeExtractLink _e = new EpisodeExtractLink();
+                    EpisodeLinkData _e = new EpisodeLinkData();
                     string quality;
 
                     foreach (JProperty _jProperty in fundingSource.Children<JProperty>()) {
@@ -133,7 +149,7 @@ namespace AnimePaheExtractorWPF {
                 return episodeExtractLink;
 
             } catch {
-                return new List<EpisodeExtractLink>();
+                return new List<EpisodeLinkData>();
             }
         }
 
@@ -153,34 +169,43 @@ namespace AnimePaheExtractorWPF {
         public IList<Dictionary<string, string>> Data { get; set; }
     }
 
-    class EpisodeExtractLink {
+    public class Serie {
+        public string Title;
+        public int Id;
+
+        public Serie(string _title, int _id) {
+            Title = _title;
+            Id = _id;
+        }
+    }
+
+    public class Range {
+        public int From;
+        public int To;
+    }
+
+    public class Episode {
+        public double EpisodeNumber;
+        public string Session;
+        public IList<EpisodeLinkData> EpisodeLinksData;
+
+        public Episode(double episodeNumber, string session) {
+            EpisodeNumber = episodeNumber;
+            Session = session;
+        }
+
+        public async Task<bool> GatherEpisodeLinksData(int serieId) {
+            EpisodeLinksData = await AnimepaheExtractor.GetEpisodeLinksData(serieId, Session);
+            if (EpisodeLinksData != null) {
+                return true;
+            } else return false;
+        }
+
+    }
+
+    public class EpisodeLinkData {
         public int Quality;
         public string FanSub;
         public string Url;
-    }
-
-    class EpisodesList {
-        public int Total;
-        public int Perpage;
-        public int CurrentPage;
-        public string NextPageUrl;
-        public string PrevPageUrl;
-        public int From;
-        public int To;
-        public IList<EpisodeData> Data;
-        public class EpisodeData {
-            public int Id;
-            public int Anime_id;
-            public int Episode;
-            public int Episode2;
-            public string Edition;
-            public string Title;
-            public string Snapshot;
-            public string Disc;
-            public string Duration;
-            public string Session;
-            public int Filler;
-            public string CreatedAt;
-        }
     }
 }

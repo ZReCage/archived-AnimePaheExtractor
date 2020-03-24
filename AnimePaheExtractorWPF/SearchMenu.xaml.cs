@@ -78,12 +78,18 @@ namespace AnimePaheExtractorWPF {
                         };
 
                         _r.StartExtraction.Click += (s, e) => {
+                            Serie _serie = new Serie(_r.Title, Convert.ToInt32(_r.Id));
 
-                            MainWindow.ReadyToExtract(new Dictionary<string, string>(){
-                                {"title", _r.Title },
-                                {"id", _r.Id },
-                            }, 1, Convert.ToInt32(_r.Episodes));
+                            if (_r.ExtractAllRadioButton.IsChecked == true)
+                                MainWindow.ReadyToExtract(_serie);
+                            else {
+                                Range _range = new Range() {
+                                    From = Convert.ToInt32(_r.FromTextBox.Text),
+                                    To = Convert.ToInt32(_r.ToTextBox.Text)
+                                };
 
+                                MainWindow.ReadyToExtract(_serie, _range);
+                            }
                         };
 
                         /*
