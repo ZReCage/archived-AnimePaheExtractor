@@ -49,8 +49,20 @@ namespace AnimePaheExtractorWPF {
                 CurrentGridItem.StatusEnum = ExtractionStatus.Starting;
 
                 // Sets Serie path
-                DirectoryInfo _directory = Directory.CreateDirectory($"{ Directory.GetCurrentDirectory()}\\{ CurrentSerie.Title}");
-                string _fileName = $"{_directory.FullName}\\Episode {CurrentGridItem.Episode.EpisodeNumber}.mp4";
+                string _title = CurrentSerie.Title;
+                string _epNumber = CurrentGridItem.Episode.EpisodeNumber.ToString();
+
+
+                foreach (var _c in Path.GetInvalidFileNameChars()) {
+                    _title = _title.Replace(_c, '-');
+                }
+                
+                foreach (var _c in Path.GetInvalidFileNameChars()) {
+                    _epNumber = _epNumber.Replace(_c, '-');
+                }
+
+                DirectoryInfo _directory = Directory.CreateDirectory($"{ Directory.GetCurrentDirectory()}\\{_title}");
+                string _fileName = $"{_directory.FullName}\\Episode {_epNumber}.mp4";
 
                 // File already exists, then ERROR
                 if (File.Exists(_fileName)) {
