@@ -6,77 +6,120 @@ using System.Collections.Generic;
 using PuppeteerSharp;
 using System;
 using Newtonsoft.Json.Linq;
+using System.Threading;
 
 namespace AnimePaheExtractorWPF {
     class AnimepaheExtractor {
         static Browser DefaultBrowser = null;
+        static bool InitializingPuppeteer = false;
         static Page CurrentPage;
-        static string UrlExtracted;
 
-        static WebClient WC;
-
-        public static async Task<bool> InitializePuppeteer() {
-            if(DefaultBrowser == null) {
-                try {
-                    WC = new WebClient();
-
-                    await new BrowserFetcher().DownloadAsync(BrowserFetcher.DefaultRevision);
-                    DefaultBrowser = await Puppeteer.LaunchAsync(new LaunchOptions {
-                        Headless = false
-                    });
-                    IList<Page> _p = await DefaultBrowser.PagesAsync();
-                    CurrentPage = _p[0];
-
-                    await CurrentPage.SetRequestInterceptionAsync(true);
-                    CurrentPage.Request += Request;
-                    CurrentPage.Response += Response;
-
-                    return true;
-                } catch {
-                    return false;
-                }
+        public static void InitializePuppeteer(Extract _extract) {
+            if (DefaultBrowser != null && DefaultBrowser.IsClosed){
+                DefaultBrowser.Dispose();
+                DefaultBrowser = null;
             }
-            return true;
+
+            if (DefaultBrowser == null) {
+                if (InitializingPuppeteer)
+                    return;
+
+                InitializingPuppeteer = true;
+
+
+                _ = Task.Factory.StartNew ( async () => {
+                    try {
+                        SetStatusBar(_extract, ExtractComponentModel.StatusBarEnum.PreparingChromium);
+
+                        RevisionInfo _revisionInfo = await new BrowserFetcher().DownloadAsync(BrowserFetcher.DefaultRevision);
+
+                        if (_revisionInfo.Downloaded) {
+                            SetStatusBar(_extract, ExtractComponentModel.StatusBarEnum.Launching);
+                            _extract.IsEnableable = true;
+
+                        } else
+                            SetStatusBar(_extract, ExtractComponentModel.StatusBarEnum.Error);
+
+                        DefaultBrowser = await Puppeteer.LaunchAsync(new LaunchOptions {
+                            Headless = false
+                        });
+
+                        IList<Page> _p = await DefaultBrowser.PagesAsync();
+                        CurrentPage = _p[0];
+
+                        SetStatusBar(_extract, ExtractComponentModel.StatusBarEnum.Ready);
+
+                    } catch { }
+                });
+            }
+
+            InitializingPuppeteer = false;
         }
 
-        public static async void GetUrlToExtract(string serverUrl) {
+        public static void FinishPuppeteer() {
+            if (DefaultBrowser != null) {
+                DefaultBrowser.Dispose();
+                DefaultBrowser = null;
+            }
+        }
+
+        public static async void SetStatusBar(Extract _extract, ExtractComponentModel.StatusBarEnum _statusBarEnum) {
+            await Task.Factory.StartNew(() => _extract.ExtractCM.StatusEnum = _statusBarEnum);
+        }
+
+        public static async Task<string> GetUrlToExtract(string serverUrl) {
+            string _urlExtracted = null;
+
             Task<Response> gotoPageToLoad = CurrentPage.GoToAsync(serverUrl);
+
+            await CurrentPage.SetRequestInterceptionAsync(true);
+
+            EventHandler<RequestEventArgs> _request = null;
+            _request = async (s, e) => {
+                // if pageToLoad
+                /*if (e.Request.IsNavigationRequest && e.Request.Url.Contains("https://kwik.cx/f/")) {
+                    // Adds referer, needed to load page for some reason
+                    e.Request.Headers.Add("referer", "https://kwik.cx");
+
+                    Payload data = new Payload {
+                        Headers = e.Request.Headers,
+                    };
+
+                    await e.Request.ContinueAsync(data);
+
+                } else*/ if (_urlExtracted != null) {
+                    await e.Request.AbortAsync();
+
+                    CurrentPage.Request -= _request;
+
+                    await CurrentPage.GoToAsync("about:blank");
+
+                } else
+                    await e.Request.ContinueAsync();
+            };
+            CurrentPage.Request += _request;
+
+            EventHandler<ResponseCreatedEventArgs> _response = null;
+            _response = (s, e) => {
+                if (e.Response.Url.Contains("https://kwik.cx/d/")) {
+                    if (e.Response.Headers.TryGetValue("location", out _urlExtracted)) {
+                        CurrentPage.Response -= _response;
+                    }
+                }
+                    
+            };
+            CurrentPage.Response += _response;
 
             await gotoPageToLoad;
 
             await CurrentPage.WaitForSelectorAsync("button");
             await CurrentPage.ClickAsync("button");
-        }
 
-        static async void Request(object sender, RequestEventArgs e) {
-            // if pageToLoad
-            if (e.Request.IsNavigationRequest && e.Request.Url.Contains("https://kwik.cx/f/")) {
-                // Adds referer, needed to load page for some reason
-                e.Request.Headers.Add("referer", "https://kwik.cx");
-
-                Payload data = new Payload {
-                    Headers = e.Request.Headers,
-                };
-
-                await e.Request.ContinueAsync(data);
-
-            } else if (UrlExtracted != null) {
-                await e.Request.AbortAsync();
-
-                CurrentPage.Request -= Request;
-
-            } else
-                await e.Request.ContinueAsync();
-        }
-        static void Response(object sender, ResponseCreatedEventArgs e) {
-            if (e.Response.Url.Contains("https://kwik.cx/d/")) {
-                // Download link
-                e.Response.Headers.TryGetValue("location", out UrlExtracted);
-            }
+            return _urlExtracted;
         }
 
         public static async Task<SearchResults> Search(string query) {
-            query = query.Length > 0 ? query : "boku no piko";
+            query = query.Length > 0 ? query : "boku no piko"; // ???
 
             string uri = "https://animepahe.com/api?m=search&l=8&q=" + query.Substring(0, query.Length > 32 ? 32 : query.Length);
 

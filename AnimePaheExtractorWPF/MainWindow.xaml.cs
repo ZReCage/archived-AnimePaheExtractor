@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -15,11 +16,9 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace AnimePaheExtractorWPF {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window {
         static MainWindow _mainWindow;
+        static Extract Extract;
 
         public MainWindow() {
             _mainWindow = this;
@@ -27,33 +26,42 @@ namespace AnimePaheExtractorWPF {
         }
 
         public static async void ReadyToExtract(Serie _serie, Range _range = null) {
-            Task<bool> init = AnimepaheExtractor.InitializePuppeteer();
+            MainWindow.IsSearchTabEnabled = false;
+            AnimePaheExtractorWPF.Extract.CurrentSerie = _serie;
 
-            Extract.CurrentSerie = _serie;
+            Extract Extract = new Extract();
+            _mainWindow.ExtractTabItem.Content = Extract;
 
-            Extract _extract = new Extract();
-            _mainWindow.ExtractTabItem.Content = _extract;
             _mainWindow.MainMenuTabControl.SelectedIndex = 2;
 
-            Extract.CurrentEpisodes = await AnimepaheExtractor.GetEpisodesList(Extract.CurrentSerie.Id, _range);
+            AnimepaheExtractor.InitializePuppeteer(Extract);
 
+            IList<Episode> _episodes = await AnimepaheExtractor.GetEpisodesList(Extract.CurrentSerie.Id, _range);
 
-            foreach(Episode _episode in Extract.CurrentEpisodes) {
+            /////////////////////////////////////////Extract.CurrentExtractListViewItems = new List<ExtractListViewItem>();
+
+            foreach (Episode _episode in _episodes) {
                 bool _gathered = await _episode.GatherEpisodeLinksData(Extract.CurrentSerie.Id);
 
                 if( _gathered ) {
-                    ExtractListViewItems _items = new ExtractListViewItems() {
-                        Number = _episode.EpisodeNumber,
+                    ExtractGridItem _item = new ExtractGridItem() {
+                        EpisodeNumber = _episode.EpisodeNumber,
                         Quality = _episode.EpisodeLinksData[0].Quality,
                         FanSub = _episode.EpisodeLinksData[0].FanSub,
-                        Progress = 0
+                        Progress = 0,
+                        StatusEnum = ExtractionStatus.Queued,
+
+                        Episode = _episode
                     };
-                
-                    _extract.ExtractListView.Items.Add(_items);
+
+                    //////////////////////////////////////////////Extract.CurrentExtractListViewItems.Add(_item);
+                    Extract.ExtractsGrid.DataContext = _item;
+
+                    Extract.ExtractsGrid.Items.Add(_item);
+                    
+                    Extract.ExtractsGrid_AddItem(_item);
                 }
             }
-
-            await init;
         }
 
         public static bool IsSearchTabEnabled {
@@ -67,11 +75,82 @@ namespace AnimePaheExtractorWPF {
             SearchTabItem.IsSelected = true;
         }
 
-        public class ExtractListViewItems {
-            public double Number { get; set; }
-            public int Quality { get; set; }
-            public string FanSub { get; set; }
-            public int Progress { get; set; }
+        void DataWindow_Closing(object sender, CancelEventArgs e) {
+            AnimepaheExtractor.FinishPuppeteer();
+            if (Extract != null && Extract.Downloader != null) {
+                Extract.Downloader.StopDownload();
+            }
         }
+    }
+    public class ExtractGridItem : INotifyPropertyChanged {
+        public double EpisodeNumber { get; set; }
+        public int Quality { get; set; }
+        public string FanSub { get; set; }
+
+        private int _progress;
+        public int Progress {
+            get => _progress;
+            set {
+                _progress = value;
+                OnPropertyChanged("Progress");
+            }
+        }
+
+        public string Status { get; set; }
+
+        private ExtractionStatus _statusEnum;
+        public ExtractionStatus StatusEnum {
+            get => _statusEnum;
+
+            set {
+                if (_statusEnum != value) {
+                    switch (value) {
+                        case ExtractionStatus.Queued:
+                            Status = "Queued";
+                            break;
+
+                        case ExtractionStatus.Starting:
+                            Status = "Starting";
+                            break;
+
+                        case ExtractionStatus.Downloading:
+                            Status = "Downloading";
+                            break;
+
+                        case ExtractionStatus.Completed:
+                            Status = "Completed";
+                            break;
+
+                        case ExtractionStatus.Error:
+                            Status = "There was an error";
+                            break;
+                    }
+                    OnPropertyChanged("Status");
+
+                    _statusEnum = value;
+                }
+            }
+
+        }
+
+        public Episode Episode;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged(string name) {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (handler != null) {
+                handler(this, new PropertyChangedEventArgs(name));
+            }
+        }
+    }
+
+    public enum ExtractionStatus {
+        Null,
+        Queued,
+        Starting,
+        Downloading,
+        Completed,
+        Error
     }
 }

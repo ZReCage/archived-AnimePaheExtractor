@@ -10,32 +10,72 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
-        
+
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <TextBlock Grid.Column="0" Text="{Binding Title, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Foreground="White" FontSize="36" />
-            <Button Grid.Column="1" Content="Let's go" Click="Button_Click"/>
+            <TextBlock Text="{Binding Title, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Foreground="White" FontSize="36" />
         </Grid>
-        <ListView x:Name="ExtractListView" Grid.Row="1">
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="#" Width="80"  DisplayMemberBinding="{Binding Path=Number}"/>
-                    <GridViewColumn Header="Quality" Width="120" DisplayMemberBinding="{Binding Path=Quality}"/>
-                    <GridViewColumn Header="FanSub" Width="200" DisplayMemberBinding="{Binding Path=FanSub}"/>
-                    <GridViewColumn Header="Progress" Width="120">
-                        <GridViewColumn.CellTemplate>
+
+        <ScrollViewer Grid.Row="1"  HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Name="dgScrollViewer">
+            <DataGrid AutoGenerateColumns="False" Name="ExtractsGrid" VerticalContentAlignment="Center" DockPanel.Dock="Top" 
+                            BorderThickness="0" IsReadOnly="True" GridLinesVisibility="None" MinRowHeight="22" HeadersVisibility="Column"
+                            CanUserResizeRows="False" BorderBrush="Transparent" Background="Transparent" Foreground="White">
+                <DataGrid.Resources>
+                    <Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}" TargetType="{x:Type DataGridColumnHeader}">
+                        <Setter Property="Background" Value="#33000000" />
+                    </Style>
+                </DataGrid.Resources>
+                
+                <DataGrid.RowStyle>
+                    <Style TargetType="DataGridRow">
+                        <Setter Property="Background" Value="Transparent"></Setter>
+                    </Style>
+                </DataGrid.RowStyle>
+                
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="#" MinWidth="10" Width="50" x:Name="_EpisodeNumber" Binding="{Binding EpisodeNumber, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <DataGridTextColumn Header="Quality" MinWidth="70" Width="100" x:Name="_Quality" Binding="{Binding Quality, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <DataGridTextColumn Header="FanSub" MinWidth="100" Width="150" x:Name="_FanSub" Binding="{Binding FanSub, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <DataGridTextColumn Header="Status" MinWidth="80" Width="150" x:Name="_Status" Binding="{Binding Status, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <DataGridTemplateColumn Header="Progress" MinWidth="100" Width="200" x:Name="_Progress">
+                        <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <ProgressBar Height="20" Width="100" Value="{Binding Path=Progress}" />
+                                <Grid Width="Auto" Height="Auto">
+                                    <ProgressBar Foreground="#FFD5015B" Background="Transparent" Name="progressBar" Value="{Binding Progress, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Height="16" MinHeight="16" />
+                                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=Progress, StringFormat={}{0}%}"/>
+                                </Grid>
                             </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                </GridView>
-            </ListView.View>
-        </ListView>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </ScrollViewer>
+
+        <Separator Grid.Row="2">
+            <Separator.Background>
+                <RadialGradientBrush>
+                    <GradientStop Color="#00000000" Offset="1"/>
+                    <GradientStop Color="White" Offset="0"/>
+                </RadialGradientBrush>
+            </Separator.Background>
+        </Separator>
+
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Text="{Binding StatusBar, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Foreground="White"/>
+            <Button Grid.Column="1" x:Name="StartExtraction" Content="Start Extraction" Click="StartExtraction_Click" IsEnabled="False"/>
+        </Grid>
+
     </Grid>
 </UserControl>
