@@ -57,7 +57,7 @@ namespace AnimePaheExtractorWPF {
                         _data.TryGetValue("type", out string _type);
                         _data.TryGetValue("episodes", out string _episodes);
                         _data.TryGetValue("season", out string _season);
-                        _data.TryGetValue("image", out string _uriImage);
+                        _data.TryGetValue("poster", out string _uriImage);
 
                         SearchResult _r = new SearchResult {
                             Id = _id,
@@ -116,12 +116,20 @@ namespace AnimePaheExtractorWPF {
 
                     SearchResultPreview.Children.Add(Poster);
                 } else {
-                    TextBlock _t = new TextBlock();
-                    _t.Text = ("Nothing were found");
-                    _t.FontSize = 32;
-                    _t.Foreground = Brushes.White;
+                    TextBlock _tError = new TextBlock {
+                        Text = "Nothing was found.",
+                        FontSize = 32,
+                        Foreground = Brushes.White
+                    };
 
-                    SearchResultsStackPanel.Children.Add(_t);
+                    TextBlock _tHelp = new TextBlock {
+                        Text = "Maybe it's just a typo (I'm used to it). Try another search criteria.",
+                        FontSize = 18,
+                        Foreground = Brushes.DarkGray
+                    };
+
+                    SearchResultsStackPanel.Children.Add(_tError);
+                    SearchResultsStackPanel.Children.Add(_tHelp);
                 }
                 UpdateLayout();
             }

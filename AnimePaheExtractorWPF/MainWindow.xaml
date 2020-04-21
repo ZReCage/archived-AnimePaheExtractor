@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:AnimePaheExtractorWPF"
         mc:Ignorable="d"
         Closing="DataWindow_Closing"
-        Title="AnimePahe Extractor alpha 0.1 - Project code 'HueleComoAQlo'" Height="450" Width="800" Background="Transparent" Foreground="#00000000" BorderBrush="Red">
+        Title="AnimePahe Extractor alpha 0.2 - c0dename 'HueleComoAQlow'" Height="450" Width="800" Background="Transparent" Foreground="#00000000" BorderBrush="Red">
     <Window.Resources>
 
     </Window.Resources>
