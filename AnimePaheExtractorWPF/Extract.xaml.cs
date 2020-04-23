@@ -15,8 +15,9 @@ namespace AnimePaheExtractorWPF {
     public partial class Extract : UserControl {
         // Do not do this
         public static Serie CurrentSerie;
-        ExtractGridItem CurrentGridItem = null;
+        private ExtractGridItem CurrentGridItem = null;
         bool isExtractionStarted = false;
+        private Thread currentDownloadThread = null;
 
         public ExtractComponentModel ExtractCM;
 
@@ -42,7 +43,7 @@ namespace AnimePaheExtractorWPF {
             Thread.Sleep(1500);
 
             if (CurrentGridItem != null) {
-                Downloader Downloader = new Downloader();
+                Downloader = new Downloader();
                 Downloader.ProgressChanged += _downloader_ProgressChanged;
                 Downloader.Completed += _downloader_Completed;
 
@@ -84,8 +85,12 @@ namespace AnimePaheExtractorWPF {
                 
                     }
 
+                    // Aborts last thread
+                    if (currentDownloadThread != null)
+                        currentDownloadThread.Abort();
+
                     // Starts Download
-                    new Thread(new ThreadStart(() => { Downloader.DownloadFile(_urlToExtract, _fileName); })).Start();
+                    Downloader.DownloadFile(_urlToExtract, _fileName);
                     CurrentGridItem.StatusEnum = ExtractionStatus.Downloading;
                 }
             }
@@ -153,7 +158,14 @@ namespace AnimePaheExtractorWPF {
 
         public bool stop = true; // by default stop is true
 
+        public Thread dThread;
+
         public void DownloadFile(string downloadLink, string path) {
+            dThread = new Thread(new ThreadStart(() => { downloadFile(downloadLink, path); }));
+            dThread.Start();
+        }
+
+        private void downloadFile(string downloadLink, string path) {
             stop = false; // always set this bool to false, everytime this method is called
 
             var fileInfo = new FileInfo(path);
@@ -195,7 +207,10 @@ namespace AnimePaheExtractorWPF {
                                 var currentSpeed = totalReceived / sw.Elapsed.TotalSeconds;
                                 OnProgressChanged(new DownloadProgressChangedEventArgs(totalReceived, fileSize, (long)currentSpeed));
                             } 
-                        } catch { goto _try; }
+                        } catch {
+                            Thread.Sleep(500);
+                            goto _try;
+                        }
                         sw.Stop();
                     }
                 }
@@ -207,7 +222,7 @@ namespace AnimePaheExtractorWPF {
         }
 
         public void StopDownload() {
-            stop = true;
+            stop = false;
         }
 
         protected virtual void OnResumabilityChanged(DownloadStatusChangedEventArgs e) {

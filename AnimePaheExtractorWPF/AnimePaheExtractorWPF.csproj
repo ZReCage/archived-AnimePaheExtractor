@@ -2,12 +2,14 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>MainWindow.ico</ApplicationIcon>
+    <Version>0.0.2</Version>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CrashReporter.NET.Official" Version="1.5.8" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="PuppeteerSharp" Version="2.0.2" />
   </ItemGroup>

@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using PuppeteerSharp;
 using System;
 using Newtonsoft.Json.Linq;
-using System.Threading;
 
 namespace AnimePaheExtractorWPF {
     class AnimepaheExtractor {
@@ -76,26 +75,21 @@ namespace AnimePaheExtractorWPF {
 
             EventHandler<RequestEventArgs> _request = null;
             _request = async (s, e) => {
-                // if pageToLoad
-                /*if (e.Request.IsNavigationRequest && e.Request.Url.Contains("https://kwik.cx/f/")) {
-                    // Adds referer, needed to load page for some reason
-                    e.Request.Headers.Add("referer", "https://kwik.cx");
-
-                    Payload data = new Payload {
-                        Headers = e.Request.Headers,
-                    };
-
-                    await e.Request.ContinueAsync(data);
-
-                } else*/ if (_urlExtracted != null) {
-                    await e.Request.AbortAsync();
-
-                    CurrentPage.Request -= _request;
-
-                    await CurrentPage.GoToAsync("about:blank");
+                if (_urlExtracted != null) {
+                    try {
+                        await e.Request.AbortAsync();
+                        CurrentPage.Request -= _request;
+                        await CurrentPage.GoToAsync("about:blank");
+                    } catch {
+                        // Request is already handled
+                    }
 
                 } else
-                    await e.Request.ContinueAsync();
+                    try {
+                        await e.Request.ContinueAsync();
+                    } catch {
+                        // It may continue without any trouble
+                    }
             };
             CurrentPage.Request += _request;
 

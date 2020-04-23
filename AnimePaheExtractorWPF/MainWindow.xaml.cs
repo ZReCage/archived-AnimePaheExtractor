@@ -1,24 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace AnimePaheExtractorWPF {
     public partial class MainWindow : Window {
         static MainWindow _mainWindow;
-        static Extract Extract;
+        private static Extract Extract = null;
 
         public MainWindow() {
             _mainWindow = this;
@@ -29,7 +16,7 @@ namespace AnimePaheExtractorWPF {
             MainWindow.IsSearchTabEnabled = false;
             AnimePaheExtractorWPF.Extract.CurrentSerie = _serie;
 
-            Extract Extract = new Extract();
+            Extract = new Extract();
             _mainWindow.ExtractTabItem.Content = Extract;
 
             _mainWindow.MainMenuTabControl.SelectedIndex = 2;
@@ -76,10 +63,17 @@ namespace AnimePaheExtractorWPF {
         }
 
         void DataWindow_Closing(object sender, CancelEventArgs e) {
-            AnimepaheExtractor.FinishPuppeteer();
-            if (Extract != null && Extract.Downloader != null) {
-                Extract.Downloader.StopDownload();
-            }
+            try{ // Try to destroy everything
+                AnimepaheExtractor.FinishPuppeteer();
+
+                if (Extract != null && Extract.Downloader != null) {
+                    Extract.Downloader.StopDownload();
+                    Extract.Downloader.dThread.Abort();
+                }
+            } catch { }
+
+            // Terminate process
+            System.Environment.Exit(1);
         }
     }
     public class ExtractGridItem : INotifyPropertyChanged {
