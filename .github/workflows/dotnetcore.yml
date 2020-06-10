@@ -27,4 +27,4 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: Executable-files
-        path: D:\a\AnimePaheExtractor\AnimePaheExtractor\AnimePaheExtractorWPF\bin\Release\net48
+        path: D:\a\AnimePaheExtractor\AnimePaheExtractor\Binaries
