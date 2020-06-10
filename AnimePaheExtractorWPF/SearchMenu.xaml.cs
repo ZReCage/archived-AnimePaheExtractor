@@ -6,17 +6,20 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
-namespace AnimePaheExtractorWPF {
+namespace AnimePaheExtractorWPF
+{
     /// <summary>
     /// Interaction logic for SearchMenu.xaml
     /// </summary>
-    public partial class SearchMenu : UserControl {
+    public partial class SearchMenu : UserControl
+    {
         SearchResults Results;
         SearchResult LastSearchResultClicked;
 
         Image Poster = new Image();
 
-        public SearchMenu() {
+        public SearchMenu()
+        {
             Grid.SetColumn(Poster, 1);
             Poster.VerticalAlignment = VerticalAlignment.Center;
             Poster.HorizontalAlignment = HorizontalAlignment.Center;
@@ -26,25 +29,36 @@ namespace AnimePaheExtractorWPF {
             InitializeComponent();
         }
 
-        private async void Search_Click(object sender, RoutedEventArgs e) {
-            if (SearchCriteria.Text.Length > 3) {
+        private async void Search_Click(object sender, RoutedEventArgs e)
+        {
+            if (SearchCriteria.Text.Length > 3)
+            {
 
                 SearchCriteria.IsEnabled = false;
                 SearchButton.IsEnabled = false;
 
-                Results = await AnimepaheExtractor.Search(SearchCriteria.Text);
+                try
+                {
+                    Results = await AnimepaheExtractor.Search(SearchCriteria.Text);
+                }
+                catch
+                {
+                    Results = new SearchResults();
+                }
 
                 SearchCriteria.IsEnabled = true;
                 SearchButton.IsEnabled = true;
 
-                IList < SearchResult > searchResultsList = new List<SearchResult>();
+                IList<SearchResult> searchResultsList = new List<SearchResult>();
 
                 SearchResultsStackPanel.Children.Clear();
                 SearchResultPreview.Children.Clear();
 
-                if (Results.Total > 0) {
+                if (Results.Total > 0)
+                {
 
-                    foreach (Dictionary<string, string> _data in Results.Data) {
+                    foreach (Dictionary<string, string> _data in Results.Data)
+                    {
 
                         _data.TryGetValue("id", out string _id);
                         _data.TryGetValue("title", out string _title);
@@ -53,7 +67,8 @@ namespace AnimePaheExtractorWPF {
                         _data.TryGetValue("season", out string _season);
                         _data.TryGetValue("poster", out string _uriImage);
 
-                        SearchResult _r = new SearchResult {
+                        SearchResult _r = new SearchResult
+                        {
                             Id = _id,
                             Title = _title,
                             Type = _type,
@@ -61,7 +76,8 @@ namespace AnimePaheExtractorWPF {
                             Season = _season,
                         };
 
-                        _r.SearchResultDropDown.Click += (s, ev) => {
+                        _r.SearchResultDropDown.Click += (s, ev) =>
+                        {
                             _r.ExtractOptions.Visibility = Visibility.Visible;
                             Poster.Source = _r.Image;
 
@@ -71,13 +87,16 @@ namespace AnimePaheExtractorWPF {
                             LastSearchResultClicked = _r;
                         };
 
-                        _r.StartExtraction.Click += (s, ev) => {
+                        _r.StartExtraction.Click += (s, ev) =>
+                        {
                             Serie _serie = new Serie(_r.Title, Convert.ToInt32(_r.Id));
 
                             if (_r.ExtractAllRadioButton.IsChecked == true)
                                 MainWindow.ReadyToExtract(_serie);
-                            else {
-                                Range _range = new Range() {
+                            else
+                            {
+                                Range _range = new Range()
+                                {
                                     From = Convert.ToInt32(_r.FromTextBox.Text),
                                     To = Convert.ToInt32(_r.ToTextBox.Text)
                                 };
@@ -109,14 +128,18 @@ namespace AnimePaheExtractorWPF {
                     }
 
                     SearchResultPreview.Children.Add(Poster);
-                } else {
-                    TextBlock _tError = new TextBlock {
+                }
+                else
+                {
+                    TextBlock _tError = new TextBlock
+                    {
                         Text = "Nothing was found.",
                         FontSize = 32,
                         Foreground = Brushes.White
                     };
 
-                    TextBlock _tHelp = new TextBlock {
+                    TextBlock _tHelp = new TextBlock
+                    {
                         Text = "Maybe it's just a typo (I'm used to it). Try another search criteria.",
                         FontSize = 18,
                         Foreground = Brushes.DarkGray
@@ -130,7 +153,8 @@ namespace AnimePaheExtractorWPF {
 
         }
 
-        private void OnKeyUpHandler(object sender, KeyEventArgs e) {
+        private void OnKeyUpHandler(object sender, KeyEventArgs e)
+        {
             if (e.Key == Key.Return)
                 Search_Click(sender, e);
         }

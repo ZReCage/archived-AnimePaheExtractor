@@ -1,12 +1,17 @@
 ﻿using System.ComponentModel;
 
-namespace AnimePaheExtractorWPF {
-    public class ExtractComponentModel : INotifyPropertyChanged {
+namespace AnimePaheExtractorWPF
+{
+    public class ExtractComponentModel : INotifyPropertyChanged
+    {
         private string _title;
-        public string Title {
+        public string Title
+        {
             get { return _title; }
-            set {
-                if (_title != value) {
+            set
+            {
+                if (_title != value)
+                {
                     _title = value;
                     OnPropertyChanged("Title");
                 }
@@ -14,10 +19,13 @@ namespace AnimePaheExtractorWPF {
         }
         private string _id;
 
-        public string Id {
+        public string Id
+        {
             get { return _id; }
-            set {
-                if (_id != value) {
+            set
+            {
+                if (_id != value)
+                {
                     _id = value;
                     // NotifyPropertyChanged("Id");
                 }
@@ -27,12 +35,16 @@ namespace AnimePaheExtractorWPF {
         public string StatusBar { get; set; }
 
         StatusBarEnum _statusEnum;
-        public StatusBarEnum StatusEnum {
+        public StatusBarEnum StatusEnum
+        {
             get => _statusEnum;
 
-            set {
-                if (_statusEnum != value) {
-                    switch (value) {
+            set
+            {
+                if (_statusEnum != value)
+                {
+                    switch (value)
+                    {
                         case StatusBarEnum.PreparingChromium:
                             StatusBar = "Preparing Chromium";
                             break;
@@ -56,7 +68,8 @@ namespace AnimePaheExtractorWPF {
             }
         }
 
-        public enum StatusBarEnum {
+        public enum StatusBarEnum
+        {
             Null,
             PreparingChromium,
             Launching,
@@ -65,8 +78,10 @@ namespace AnimePaheExtractorWPF {
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        public void OnPropertyChanged(string propertyName = "") {
-            if (PropertyChanged != null) {
+        public void OnPropertyChanged(string propertyName = "")
+        {
+            if (PropertyChanged != null)
+            {
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }

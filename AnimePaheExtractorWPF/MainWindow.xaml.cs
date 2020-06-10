@@ -2,17 +2,21 @@
 using System.ComponentModel;
 using System.Windows;
 
-namespace AnimePaheExtractorWPF {
-    public partial class MainWindow : Window {
+namespace AnimePaheExtractorWPF
+{
+    public partial class MainWindow : Window
+    {
         static MainWindow _mainWindow;
         private static Extract Extract = null;
 
-        public MainWindow() {
+        public MainWindow()
+        {
             _mainWindow = this;
             InitializeComponent();
         }
 
-        public static async void ReadyToExtract(Serie _serie, Range _range = null) {
+        public static async void ReadyToExtract(Serie _serie, Range _range = null)
+        {
             MainWindow.IsSearchTabEnabled = false;
             AnimePaheExtractorWPF.Extract.CurrentSerie = _serie;
 
@@ -27,11 +31,14 @@ namespace AnimePaheExtractorWPF {
 
             /////////////////////////////////////////Extract.CurrentExtractListViewItems = new List<ExtractListViewItem>();
 
-            foreach (Episode _episode in _episodes) {
+            foreach (Episode _episode in _episodes)
+            {
                 bool _gathered = await _episode.GatherEpisodeLinksData(Extract.CurrentSerie.Id);
 
-                if( _gathered ) {
-                    ExtractGridItem _item = new ExtractGridItem() {
+                if (_gathered)
+                {
+                    ExtractGridItem _item = new ExtractGridItem()
+                    {
                         EpisodeNumber = _episode.EpisodeNumber,
                         Quality = _episode.EpisodeLinksData[0].Quality,
                         FanSub = _episode.EpisodeLinksData[0].FanSub,
@@ -45,46 +52,56 @@ namespace AnimePaheExtractorWPF {
                     Extract.ExtractsGrid.DataContext = _item;
 
                     Extract.ExtractsGrid.Items.Add(_item);
-                    
+
                     Extract.ExtractsGrid_AddItem(_item);
                 }
             }
         }
 
-        public static bool IsSearchTabEnabled {
-            get{ return _mainWindow.SearchTabItem.IsEnabled; }
-            set{
+        public static bool IsSearchTabEnabled
+        {
+            get { return _mainWindow.SearchTabItem.IsEnabled; }
+            set
+            {
                 _mainWindow.SearchTabItem.IsEnabled = value;
             }
         }
 
-        private void GoToSearch_Click(object sender, RoutedEventArgs e) {
+        private void GoToSearch_Click(object sender, RoutedEventArgs e)
+        {
             SearchTabItem.IsSelected = true;
         }
 
-        void DataWindow_Closing(object sender, CancelEventArgs e) {
-            try{ // Try to destroy everything
+        void DataWindow_Closing(object sender, CancelEventArgs e)
+        {
+            try
+            { // Try to destroy everything
                 AnimepaheExtractor.FinishPuppeteer();
 
-                if (Extract != null && Extract.Downloader != null) {
+                if (Extract != null && Extract.Downloader != null)
+                {
                     Extract.Downloader.StopDownload();
                     Extract.Downloader.dThread.Abort();
                 }
-            } catch { }
+            }
+            catch { }
 
             // Terminate process
             System.Environment.Exit(1);
         }
     }
-    public class ExtractGridItem : INotifyPropertyChanged {
+    public class ExtractGridItem : INotifyPropertyChanged
+    {
         public double EpisodeNumber { get; set; }
         public int Quality { get; set; }
         public string FanSub { get; set; }
 
         private int _progress;
-        public int Progress {
+        public int Progress
+        {
             get => _progress;
-            set {
+            set
+            {
                 _progress = value;
                 OnPropertyChanged("Progress");
             }
@@ -93,12 +110,16 @@ namespace AnimePaheExtractorWPF {
         public string Status { get; set; }
 
         private ExtractionStatus _statusEnum;
-        public ExtractionStatus StatusEnum {
+        public ExtractionStatus StatusEnum
+        {
             get => _statusEnum;
 
-            set {
-                if (_statusEnum != value) {
-                    switch (value) {
+            set
+            {
+                if (_statusEnum != value)
+                {
+                    switch (value)
+                    {
                         case ExtractionStatus.Queued:
                             Status = "Queued";
                             break;
@@ -131,15 +152,18 @@ namespace AnimePaheExtractorWPF {
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected void OnPropertyChanged(string name) {
+        protected void OnPropertyChanged(string name)
+        {
             PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null) {
+            if (handler != null)
+            {
                 handler(this, new PropertyChangedEventArgs(name));
             }
         }
     }
 
-    public enum ExtractionStatus {
+    public enum ExtractionStatus
+    {
         Null,
         Queued,
         Starting,

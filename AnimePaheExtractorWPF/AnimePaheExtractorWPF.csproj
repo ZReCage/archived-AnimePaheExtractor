@@ -6,12 +6,40 @@
     <UseWPF>true</UseWPF>
     <ApplicationIcon>MainWindow.ico</ApplicationIcon>
     <Version>0.0.2</Version>
+    <Company>ZReCorp</Company>
+    <Authors>ZReC</Authors>
+    <Product>AnimePahe Extractor</Product>
+    <Copyright>2020</Copyright>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <OutputPath>../Binaries</OutputPath>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="CrashReporter.NET.Official" Version="1.5.8" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="PuppeteerSharp" Version="2.0.2" />
+    <PackageReference Include="PuppeteerSharp" Version="2.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Update="System">
+      <EmbedInteropTypes>true</EmbedInteropTypes>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Update="System.Core">
+      <EmbedInteropTypes>true</EmbedInteropTypes>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Update="WindowsBase">
+      <EmbedInteropTypes>true</EmbedInteropTypes>
+    </Reference>
   </ItemGroup>
 
 </Project>

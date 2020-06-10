@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "AnimePaheExtractorWPF": {
+      "commandName": "Project",
+      "remoteDebugEnabled": false
+    }
+  }
+}

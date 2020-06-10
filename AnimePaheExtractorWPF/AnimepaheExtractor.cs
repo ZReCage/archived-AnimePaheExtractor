@@ -6,40 +6,51 @@ using System.Collections.Generic;
 using PuppeteerSharp;
 using System;
 using Newtonsoft.Json.Linq;
+using System.Linq;
 
-namespace AnimePaheExtractorWPF {
-    class AnimepaheExtractor {
+namespace AnimePaheExtractorWPF
+{
+    class AnimepaheExtractor
+    {
         static Browser DefaultBrowser = null;
         static bool InitializingPuppeteer = false;
         static Page CurrentPage;
 
-        public static void InitializePuppeteer(Extract _extract) {
-            if (DefaultBrowser != null && DefaultBrowser.IsClosed){
+        public static void InitializePuppeteer(Extract _extract)
+        {
+            if (DefaultBrowser != null && DefaultBrowser.IsClosed)
+            {
                 DefaultBrowser.Dispose();
                 DefaultBrowser = null;
             }
 
-            if (DefaultBrowser == null) {
+            if (DefaultBrowser == null)
+            {
                 if (InitializingPuppeteer)
                     return;
 
                 InitializingPuppeteer = true;
 
 
-                _ = Task.Factory.StartNew ( async () => {
-                    try {
+                _ = Task.Factory.StartNew(async () =>
+                {
+                    try
+                    {
                         SetStatusBar(_extract, ExtractComponentModel.StatusBarEnum.PreparingChromium);
 
                         RevisionInfo _revisionInfo = await new BrowserFetcher().DownloadAsync(BrowserFetcher.DefaultRevision);
 
-                        if (_revisionInfo.Downloaded) {
+                        if (_revisionInfo.Downloaded)
+                        {
                             SetStatusBar(_extract, ExtractComponentModel.StatusBarEnum.Launching);
                             _extract.IsEnableable = true;
 
-                        } else
+                        }
+                        else
                             SetStatusBar(_extract, ExtractComponentModel.StatusBarEnum.Error);
 
-                        DefaultBrowser = await Puppeteer.LaunchAsync(new LaunchOptions {
+                        DefaultBrowser = await Puppeteer.LaunchAsync(new LaunchOptions
+                        {
                             Headless = false
                         });
 
@@ -48,25 +59,30 @@ namespace AnimePaheExtractorWPF {
 
                         SetStatusBar(_extract, ExtractComponentModel.StatusBarEnum.Ready);
 
-                    } catch { }
+                    }
+                    catch { }
                 });
             }
 
             InitializingPuppeteer = false;
         }
 
-        public static void FinishPuppeteer() {
-            if (DefaultBrowser != null) {
+        public static void FinishPuppeteer()
+        {
+            if (DefaultBrowser != null)
+            {
                 DefaultBrowser.Dispose();
                 DefaultBrowser = null;
             }
         }
 
-        public static async void SetStatusBar(Extract _extract, ExtractComponentModel.StatusBarEnum _statusBarEnum) {
+        public static async void SetStatusBar(Extract _extract, ExtractComponentModel.StatusBarEnum _statusBarEnum)
+        {
             await Task.Factory.StartNew(() => _extract.ExtractCM.StatusEnum = _statusBarEnum);
         }
 
-        public static async Task<string> GetUrlToExtract(string serverUrl) {
+        public static async Task<string> GetUrlToExtract(string serverUrl)
+        {
             string _urlExtracted = null;
 
             Task<Response> gotoPageToLoad = CurrentPage.GoToAsync(serverUrl);
@@ -74,33 +90,45 @@ namespace AnimePaheExtractorWPF {
             await CurrentPage.SetRequestInterceptionAsync(true);
 
             EventHandler<RequestEventArgs> _request = null;
-            _request = async (s, e) => {
-                if (_urlExtracted != null) {
-                    try {
+            _request = async (s, e) =>
+            {
+                if (_urlExtracted != null)
+                {
+                    try
+                    {
                         await e.Request.AbortAsync();
                         CurrentPage.Request -= _request;
                         await CurrentPage.GoToAsync("about:blank");
-                    } catch {
+                    }
+                    catch
+                    {
                         // Request is already handled
                     }
 
-                } else
-                    try {
+                }
+                else
+                    try
+                    {
                         await e.Request.ContinueAsync();
-                    } catch {
+                    }
+                    catch
+                    {
                         // It may continue without any trouble
                     }
             };
             CurrentPage.Request += _request;
 
             EventHandler<ResponseCreatedEventArgs> _response = null;
-            _response = (s, e) => {
-                if (e.Response.Url.Contains("https://kwik.cx/d/")) {
-                    if (e.Response.Headers.TryGetValue("location", out _urlExtracted)) {
+            _response = (s, e) =>
+            {
+                if (e.Response.Url.Contains("https://kwik.cx/d/"))
+                {
+                    if (e.Response.Headers.TryGetValue("location", out _urlExtracted))
+                    {
                         CurrentPage.Response -= _response;
                     }
                 }
-                    
+
             };
             CurrentPage.Response += _response;
 
@@ -112,7 +140,8 @@ namespace AnimePaheExtractorWPF {
             return _urlExtracted;
         }
 
-        public static async Task<SearchResults> Search(string query) {
+        public static async Task<SearchResults> Search(string query)
+        {
             query = query.Length > 0 ? query : "boku no piko"; // ???
 
             string uri = "https://animepahe.com/api?m=search&l=8&q=" + query.Substring(0, query.Length > 32 ? 32 : query.Length);
@@ -121,22 +150,25 @@ namespace AnimePaheExtractorWPF {
             return JsonConvert.DeserializeObject<SearchResults>(_json);
         }
 
-        public static async Task<IList<Episode>> GetEpisodesList(int _serieId, Range _range) {
+        public static async Task<IList<Episode>> GetEpisodesList(int _serieId, Range _range)
+        {
             int actualPage = _range != null ? _range.From / 31 + 1 : 1;
             int? lastPage = null;
 
             IList<Episode> _episodes = new List<Episode>();
 
-            do {
+            do
+            {
                 string uri = "https://animepahe.com/" + $"api?m=release&id={_serieId}&sort=episode_asc" + $"&page={actualPage}";
 
                 string _request = await GetRequest(uri);
 
                 JObject jsonObject = JObject.Parse(_request);
-                if(lastPage == null)
+                if (lastPage == null)
                     lastPage = Convert.ToInt32(jsonObject.SelectToken("last_page").ToString());
 
-                foreach (JToken fundingSource in jsonObject.SelectTokens("data[*]")) {
+                foreach (JToken fundingSource in jsonObject.SelectTokens("data[*]"))
+                {
                     double _episodeNumber = Convert.ToDouble(fundingSource.SelectToken("episode").ToString());
                     if (_range != null && _episodeNumber < _range.From)
                         // If the episode number is lesser than "from" then continue
@@ -156,91 +188,107 @@ namespace AnimePaheExtractorWPF {
             return _episodes;
         }
 
-        public static async Task<IList<EpisodeLinkData>> GetEpisodeLinksData(int serieId, string session) {
+        public static async Task<IList<EpisodeLinkData>> GetEpisodeLinksData(int serieId, string session)
+        {
             // Request
             string uri = "https://animepahe.com/api?m=embed&p=kwik" + $"&id={serieId}" + $"&session={session}";
             string _request = await GetRequest(uri);
 
-            try {
+            try
+            {
                 JObject jsonObject = JObject.Parse(_request);
                 IList<EpisodeLinkData> episodeExtractLink = new List<EpisodeLinkData>();
 
-                foreach (JToken fundingSource in jsonObject.SelectTokens("$.*.*")) {
-                    EpisodeLinkData _e = new EpisodeLinkData();
-                    string quality;
+                // Selects only 720 or poorer I'm sorry little ones
+                JToken fundingSource = jsonObject.SelectTokens("$.*[0]").First();
+                
+                EpisodeLinkData _e = new EpisodeLinkData();
 
-                    foreach (JProperty _jProperty in fundingSource.Children<JProperty>()) {
-                        quality = _jProperty.Name;
-                        _e.Quality = Convert.ToInt32(quality);
-                    }
+                // Gets quality, most of the time it is 720p
+                _e.Quality = Convert.ToInt32(fundingSource.Children<JProperty>().First().Name);
 
-                    string fansub = fundingSource.SelectToken("$.*.fansub").ToString();
-                    _e.FanSub = fansub;
+                // FanSub credits
+                _e.FanSub = fundingSource.SelectToken("$.*.fansub").ToString();
 
-                    string url = fundingSource.SelectToken("$.*.url").ToString().Replace("/e/", "/f/");
-                    _e.Url = url;
+                // Asks for the episode player url, I use a .Replace to get the episode download url
+                // They changed from url to kwik recently
+                string url = fundingSource.SelectToken("$.*.kwik").ToString().Replace("/e/", "/f/");
+                _e.Url = url;
 
-                    episodeExtractLink.Add(_e);
-                }
+                episodeExtractLink.Add(_e);
 
                 return episodeExtractLink;
 
-            } catch {
+            }
+            catch
+            {
                 return new List<EpisodeLinkData>();
             }
         }
 
-        public static async Task<string> GetRequest(string uri) {
+        public static async Task<string> GetRequest(string uri)
+        {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
             request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
 
             using (HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync())
             using (Stream stream = response.GetResponseStream())
-            using (StreamReader reader = new StreamReader(stream)) {
+            using (StreamReader reader = new StreamReader(stream))
+            {
                 return await reader.ReadToEndAsync();
             }
         }
     }
-    class SearchResults {
+    class SearchResults
+    {
         public int Total { get; set; }
         public IList<Dictionary<string, string>> Data { get; set; }
     }
 
-    public class Serie {
+    public class Serie
+    {
         public string Title;
         public int Id;
 
-        public Serie(string _title, int _id) {
+        public Serie(string _title, int _id)
+        {
             Title = _title;
             Id = _id;
         }
     }
 
-    public class Range {
+    public class Range
+    {
         public int From;
         public int To;
     }
 
-    public class Episode {
+    public class Episode
+    {
         public double EpisodeNumber;
         public string Session;
         public IList<EpisodeLinkData> EpisodeLinksData;
 
-        public Episode(double episodeNumber, string session) {
+        public Episode(double episodeNumber, string session)
+        {
             EpisodeNumber = episodeNumber;
             Session = session;
         }
 
-        public async Task<bool> GatherEpisodeLinksData(int serieId) {
+        public async Task<bool> GatherEpisodeLinksData(int serieId)
+        {
             EpisodeLinksData = await AnimepaheExtractor.GetEpisodeLinksData(serieId, Session);
-            if (EpisodeLinksData != null) {
+            if (EpisodeLinksData != null)
+            {
                 return true;
-            } else return false;
+            }
+            else return false;
         }
 
     }
 
-    public class EpisodeLinkData {
+    public class EpisodeLinkData
+    {
         public int Quality;
         public string FanSub;
         public string Url;
