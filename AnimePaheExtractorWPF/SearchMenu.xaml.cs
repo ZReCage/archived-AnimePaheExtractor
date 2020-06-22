@@ -37,14 +37,7 @@ namespace AnimePaheExtractorWPF
                 SearchCriteria.IsEnabled = false;
                 SearchButton.IsEnabled = false;
 
-                try
-                {
-                    Results = await AnimepaheExtractor.Search(SearchCriteria.Text);
-                }
-                catch
-                {
-                    Results = new SearchResults();
-                }
+                Results = await AnimepaheExtractor.Search(SearchCriteria.Text);
 
                 SearchCriteria.IsEnabled = true;
                 SearchButton.IsEnabled = true;

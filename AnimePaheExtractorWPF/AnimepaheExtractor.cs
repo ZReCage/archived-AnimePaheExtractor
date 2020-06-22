@@ -147,7 +147,12 @@ namespace AnimePaheExtractorWPF
             string uri = "https://animepahe.com/api?m=search&l=8&q=" + query.Substring(0, query.Length > 32 ? 32 : query.Length);
 
             string _json = await GetRequest(uri);
-            return JsonConvert.DeserializeObject<SearchResults>(_json);
+
+            // Checks _json
+            if (_json.Length > 0)
+                return JsonConvert.DeserializeObject<SearchResults>(_json);
+            else
+                return new SearchResults();
         }
 
         public static async Task<IList<Episode>> GetEpisodesList(int _serieId, Range _range)
@@ -228,14 +233,21 @@ namespace AnimePaheExtractorWPF
 
         public static async Task<string> GetRequest(string uri)
         {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
-            request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+            try { 
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
+                request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
 
-            using (HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync())
-            using (Stream stream = response.GetResponseStream())
-            using (StreamReader reader = new StreamReader(stream))
+                using (HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync())
+                using (Stream stream = response.GetResponseStream())
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    return await reader.ReadToEndAsync();
+                }
+            }
+            catch
             {
-                return await reader.ReadToEndAsync();
+                // Exception occurred
+                return "";
             }
         }
     }
