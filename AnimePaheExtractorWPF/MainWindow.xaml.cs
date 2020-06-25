@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -12,11 +13,12 @@ namespace AnimePaheExtractorWPF
         public static Extract DefExtract = null;
 
         public MainWindow()
-        {
-            DataContext = mainWindowCM;
-            
+        {            
             _mainWindow = this;
+            DataContext = mainWindowCM;
             InitializeComponent();
+
+            new Thread(new ThreadStart(() => mainWindowCM.Startup())).Start();
         }
 
         public static async void ReadyToExtract(Serie _serie, Range _range = null)

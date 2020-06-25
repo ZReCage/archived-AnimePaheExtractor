@@ -2,32 +2,35 @@
 using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Threading;
 
 namespace AnimePaheExtractorWPF
 {
     public class MainWindowComponentModel : INotifyPropertyChanged
     {
-        public MainWindowComponentModel()
+        public void Startup()
         {
             // Jokes keep my mind calm, that and Animes/Games OST while I code garbage. I like lofi lately as well
             SetStatusBar(StatusBarEnum.Default);
+    
+            string rawDataURL = "https://pastebin.com" + "/raw/" + "pKZLJWPe";
+            string rawData = AnimepaheExtractor.GetRequest(rawDataURL, 3);
 
-            Task.Run(async () => {
-                string rawDataURL = "https://pastebin.com/raw/pKZLJWPe";
-                string rawData = string.Empty;
-                rawData = await AnimepaheExtractor.GetRequest(rawDataURL);
+            if (rawData != string.Empty)
+            {
+                Thread.Sleep(1000);
+                var dataArray = rawData.Split('\n');
+                Random _random = new Random();
 
-                if(rawData != string.Empty)
-                {
-                    Thread.Sleep(1000);
-                    var dataArray = rawData.Split('\n');
-                    Random _random = new Random();
-
-                    int rIndex = _random.Next(dataArray.Length);
-                    StatusBar = dataArray[rIndex];
-                }
-            });
-
+                int rIndex = _random.Next(dataArray.Length);
+                StatusBar = dataArray[rIndex];
+            }
+            else
+            {
+                StatusBar = "Nothing to see here :(";
+            }
+            Application.Current.Dispatcher.Invoke(() => MainWindow._mainWindow.ContinueToSearch.IsEnabled = true);
         }
 
         private StatusBarEnum _statusEnum;

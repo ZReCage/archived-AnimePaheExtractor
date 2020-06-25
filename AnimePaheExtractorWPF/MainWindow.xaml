@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:AnimePaheExtractorWPF"
         mc:Ignorable="d"
         Closing="DataWindow_Closing"
-        Title="AnimePahe Extractor 0.0.3 - c0dename 'GarbageCollector'" Height="450" Width="800" MinHeight="450" MinWidth="800" Background="Transparent" Foreground="#00000000" BorderBrush="Red">
+        Title="AnimePahe Extractor 0.1.0 - c0dename 'ShouldNotExist'" Height="450" Width="800" MinHeight="450" MinWidth="800" Background="Transparent" Foreground="#00000000" BorderBrush="Red">
     <Window.Resources>
         <Style TargetType="{x:Type Button}">
             <Setter Property="Background" Value="#373737" />
@@ -144,7 +144,7 @@
                                         </Grid>
                                         <ControlTemplate.Triggers>
                                             <Trigger Property="IsSelected" Value="True">
-                                                <Setter TargetName="Panel" Property="Background" Value="#99ABCDEF" />
+                                                <Setter TargetName="Panel" Property="Background" Value="#AAE7015B" />
                                                 <Setter Property="Foreground" Value="Black"/>
                                             </Trigger>
                                             <Trigger Property="IsSelected" Value="False">
@@ -159,7 +159,7 @@
                         </Style>
                     </TabControl.Resources>
 
-                    <TabItem Header="Welcome" IsEnabled="False" Width="196">
+                    <TabItem Header="Welcome" IsEnabled="False" Width="196" Foreground="White">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="*"/>
@@ -167,10 +167,17 @@
                             </Grid.RowDefinitions>
 
                             <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                <Button x:Name="ContinueToSearch" Margin="32, 32, 32, 0" Click="GoToSearch_Click" Content="Continue to Search tab" Height="48" FontSize="24" IsEnabled="false"/>
+                                <Separator Margin="0, 48, 0, 0">
+                                    <Separator.Background>
+                                        <RadialGradientBrush>
+                                            <GradientStop Color="#00000000" Offset="1"/>
+                                            <GradientStop Color="White"/>
+                                        </RadialGradientBrush>
+                                    </Separator.Background>
+                                </Separator>
                                 <TextBlock Text="Welcome to AnimePahe Extractor!" Foreground="White" FontSize="32"/>
                                 <TextBlock Text="alpha version" Foreground="White" FontSize="14" HorizontalAlignment="Center"/>
-                                <Separator Margin="0, 8, 0, 24"/>
-                                <Button x:Name="ContinueToSearch" Margin="32, 0, 32, 0" Click="GoToSearch_Click" Content="Continue to Search tab" Height="24"/>
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Right">
@@ -206,7 +213,7 @@
                 </Separator.Background>
             </Separator>
 
-            <TextBlock Grid.Row="2" Text="{Binding Path=StatusBar, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=I want some ice cream}" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White" Height="16" TextTrimming="CharacterEllipsis"/>
+            <TextBlock Grid.Row="2" Text="{Binding Path=StatusBar, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White" Height="16" TextTrimming="CharacterEllipsis"/>
         </Grid>
     </Border>
 </Window>

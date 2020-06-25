@@ -318,17 +318,18 @@ namespace AnimePaheExtractorWPF
             return _bitmap;
         }
 
-        public static async Task<string> GetRequest(string uri)
+        public static string GetRequest(string uri, int timeoutSecs = 10)
         {
             try { 
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
                 request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+                request.Timeout = timeoutSecs * 1000;
 
-                using (HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync())
+                using (HttpWebResponse response = (HttpWebResponse) request.GetResponse())
                 using (Stream stream = response.GetResponseStream())
                 using (StreamReader reader = new StreamReader(stream))
                 {
-                    return await reader.ReadToEndAsync();
+                    return reader.ReadToEnd();
                 }
             }
             catch

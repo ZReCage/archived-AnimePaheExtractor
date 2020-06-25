@@ -141,7 +141,7 @@
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center">
                 <Button x:Name="StartExtraction">
-                    <TextBlock Text="Start Extraction" Margin="8 16 8 16" />
+                    <TextBlock Text="Gather data" Margin="8 16 8 16" />
                 </Button>
             </StackPanel>
         </Grid>
