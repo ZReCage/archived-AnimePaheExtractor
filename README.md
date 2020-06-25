@@ -7,7 +7,7 @@ Coded like my first Hello World! Unstable as a teenager.
 - Make sure you have at least .NET Framework 4.8 | https://dotnet.microsoft.com/download/dotnet-framework/net48
 - Download the last artifact in the last commit from the master (or what ever it calls in the future)
 - Launch it
-- Pray while it loads (the first time pupperteer will download Chromium)
+- Pray while it loads (the first time puppeteer will download Chromium)
 - Ingest some random garbage below
 - Search for your needs (remember this is meant to download anime, potatoes are there in the store)
 - Select a range of episodes
