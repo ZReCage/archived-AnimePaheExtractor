@@ -19,22 +19,19 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <TextBox x:Name="SearchCriteria" Grid.Column="0" BorderThickness="2,2,2,2" FontSize="14" MaxLines="1" MaxLength="32" Margin="0 0 5 0" KeyUp="OnKeyUpHandler" Background="#FF424242" BorderBrush="#FFA6A6A6" Foreground="White"/>
+            <TextBox x:Name="SearchCriteria" Grid.Column="0" BorderThickness="2,2,2,2" FontSize="14" MaxLines="1" MaxLength="32" Margin="0 0 5 0" KeyUp="OnKeyUpHandler"/>
 
-            <Button x:Name="SearchButton" Grid.Column="1" Click="Search_Click" Foreground="White">
-                <TextBlock Text="Search" Padding="5,5,5,5"/>
-
-
-                <Button.BorderBrush>
-                    <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.AppWorkspaceColorKey}}"/>
-                </Button.BorderBrush>
-                <Button.Background>
-                    <SolidColorBrush Color="#FF646464"/>
-                </Button.Background>
-            </Button>
+            <Button x:Name="SearchButton" Grid.Column="1" Click="Search_Click" Content="Search" Margin="0, 1, 0, 1" Width="64" Height="32"/>
         </Grid>
 
-        <Separator Grid.Row="1" Margin="5 5 5 5"/>
+        <Separator Grid.Row="1" Margin="0 5 0 0">
+            <Separator.Background>
+                <RadialGradientBrush>
+                    <GradientStop Color="#00000000" Offset="1"/>
+                    <GradientStop Color="White" Offset="0"/>
+                </RadialGradientBrush>
+            </Separator.Background>
+        </Separator>
 
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>

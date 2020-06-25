@@ -22,7 +22,7 @@ namespace AnimePaheExtractorWPF
                 if (_id != value)
                 {
                     _id = value;
-                    NotifyPropertyChanged("Id");
+                    OnPropertyChanged("Id");
                 }
             }
         }
@@ -35,7 +35,7 @@ namespace AnimePaheExtractorWPF
                 if (_title != value)
                 {
                     _title = value;
-                    NotifyPropertyChanged("Title");
+                    OnPropertyChanged("Title");
                 }
             }
         }
@@ -47,7 +47,7 @@ namespace AnimePaheExtractorWPF
                 if (_type != value)
                 {
                     _type = value;
-                    NotifyPropertyChanged("Type");
+                    OnPropertyChanged("Type");
                 }
             }
         }
@@ -59,7 +59,7 @@ namespace AnimePaheExtractorWPF
                 if (_episodes != value)
                 {
                     _episodes = value;
-                    NotifyPropertyChanged("Episodes");
+                    OnPropertyChanged("Episodes");
                 }
             }
         }
@@ -72,7 +72,7 @@ namespace AnimePaheExtractorWPF
                 if (_season != value)
                 {
                     _season = value;
-                    NotifyPropertyChanged("Season");
+                    OnPropertyChanged("Season");
                 }
             }
         }
@@ -81,12 +81,9 @@ namespace AnimePaheExtractorWPF
         public string Relevance { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged(string propertyName = "")
+        private void OnPropertyChanged(string propertyName = "")
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

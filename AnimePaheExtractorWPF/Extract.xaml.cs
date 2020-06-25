@@ -9,19 +9,15 @@ using System.Windows.Controls;
 
 namespace AnimePaheExtractorWPF
 {
-    /// <summary>
-    /// Interaction logic for Download.xaml
-    /// </summary>
-
     public partial class Extract : UserControl
     {
-        // Do not do this
         public static Serie CurrentSerie;
+        public bool AllEpisodesReadyToExtract = false;
         private ExtractGridItem CurrentGridItem = null;
-        bool isExtractionStarted = false;
+        private bool isExtractionStarted = false;
         private Thread currentDownloadThread = null;
 
-        public ExtractComponentModel ExtractCM;
+        public ExtractComponentModel ExtractCM = new ExtractComponentModel();
 
         public Downloader Downloader;
 
@@ -30,22 +26,28 @@ namespace AnimePaheExtractorWPF
             InitializeComponent();
             StartExtraction_SetWhenEnableable();
 
-            ExtractCM = new ExtractComponentModel();
-            this.DataContext = ExtractCM;
+            DataContext = ExtractCM;
 
             ExtractCM.Title = CurrentSerie.Title;
+
+            IsEnableable = AnimepaheExtractor.InitializePuppeteer();
         }
 
         private void StartExtraction_Click(object sender, RoutedEventArgs e)
         {
             StartExtraction.IsEnabled = false;
             isExtractionStarted = true;
-            ExtractStart();
+
+            Task.Run(async () => await ExtractStart());
         }
 
-        private async void ExtractStart()
+        private async Task ExtractStart()
         {
-            Thread.Sleep(1500);
+            // This block suspends the task until the episodes list is full
+            do
+                Thread.Sleep(500);
+            while (!AllEpisodesReadyToExtract);
+
 
             if (CurrentGridItem != null)
             {
@@ -90,7 +92,7 @@ namespace AnimePaheExtractorWPF
                     {
                         try
                         {
-                            AnimepaheExtractor.InitializePuppeteer(this); // Try to bring back to life the browser
+                            AnimepaheExtractor.InitializePuppeteer(); // Try to bring to life the browser
                             _urlToExtract = await AnimepaheExtractor.GetUrlToExtract(CurrentGridItem.Episode.EpisodeLinksData[0].Url);
                         }
                         catch
@@ -112,18 +114,18 @@ namespace AnimePaheExtractorWPF
         }
 
         public void ExtractsGrid_AddItem(ExtractGridItem item)
-        { // Check its behavior, there are better approaches
+        { // Check its behavior, there have to be better approaches
             if (CurrentGridItem == null)
             {
                 CurrentGridItem = item;
 
                 if (isExtractionStarted)
                 {
-                    ExtractStart();
+                    Task.Run(async () => await ExtractStart());
                 }
             }
         }
-
+        
         public bool IsEnableable = false;
         public async void StartExtraction_SetWhenEnableable()
         {
@@ -146,7 +148,7 @@ namespace AnimePaheExtractorWPF
             {
                 CurrentGridItem = (ExtractGridItem)ExtractsGrid.Items[_idx];
 
-                ExtractStart();
+                Task.Run(async () => await ExtractStart());
             }
             else
                 CurrentGridItem = null;
@@ -157,21 +159,10 @@ namespace AnimePaheExtractorWPF
             CurrentGridItem.Progress = (int)e.ProgressPercentage;
         }
 
-        /*private void wcDownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e) {
-            CurrentGridItem.Progress = (int)e.ProgressPercentage;
-        }*/
+        private void ExtractsGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
 
-        /*void wcDownloadFileCompleted(object sender, EventArgs e) {
-            CurrentGridItem.Status = ExtractionStatus.Completed;
-            ((WebClient)sender).Dispose();
-
-            // Next file
-            try {
-                CurrentGridItem = (ExtractGridItem)ExtractsGrid.Items[ExtractsGrid.Items.IndexOf(CurrentGridItem) + 1];
-            } catch { CurrentGridItem = null; }
-
-            ExtractStart();
-        }*/
+        }
     }
 
     // Workaround non-completed downloads
@@ -275,20 +266,12 @@ namespace AnimePaheExtractorWPF
 
         protected virtual void OnProgressChanged(DownloadProgressChangedEventArgs e)
         {
-            var handler = ProgressChanged;
-            if (handler != null)
-            {
-                handler(this, e);
-            }
+            ProgressChanged?.Invoke(this, e);
         }
 
         protected virtual void OnCompleted(EventArgs e)
         {
-            var handler = Completed;
-            if (handler != null)
-            {
-                handler(this, e);
-            }
+            Completed?.Invoke(this, e);
         }
     }
 
