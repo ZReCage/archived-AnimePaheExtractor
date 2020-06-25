@@ -248,7 +248,7 @@ namespace AnimePaheExtractorWPF
                 {
                     title = await _tmpPage.GetTitleAsync();
                 }
-                catch (EvaluationFailedException e)
+                catch
                 {
 #if DEBUG
                     Debug.WriteLine(e.Message);
@@ -286,19 +286,12 @@ namespace AnimePaheExtractorWPF
                 {
                     title = await _tmpPage.GetTitleAsync();
                 }
-                catch (EvaluationFailedException e)
+                catch
                 {
 #if DEBUG
                     Debug.WriteLine(e.Message);
 #endif
                     response = await _tmpPage.ReloadAsync();
-                }
-                catch (NullReferenceException e)
-                {
-#if DEBUG
-                    Debug.WriteLine(e.Message);
-#endif
-                    // F
                 }
             } while (!fileTypes.Any(s => title.Contains(s)));
 
