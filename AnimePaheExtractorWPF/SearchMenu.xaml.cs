@@ -5,6 +5,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Threading.Tasks;
+using System.Threading;
+using System.Diagnostics;
 
 namespace AnimePaheExtractorWPF
 {
@@ -37,14 +40,7 @@ namespace AnimePaheExtractorWPF
                 SearchCriteria.IsEnabled = false;
                 SearchButton.IsEnabled = false;
 
-                try
-                {
-                    Results = await AnimepaheExtractor.Search(SearchCriteria.Text);
-                }
-                catch
-                {
-                    Results = new SearchResults();
-                }
+                Results = await AnimepaheExtractor.Search(SearchCriteria.Text);
 
                 SearchCriteria.IsEnabled = true;
                 SearchButton.IsEnabled = true;
@@ -119,10 +115,8 @@ namespace AnimePaheExtractorWPF
                                 relevance
                          */
 
-                        _r.Image = new BitmapImage();
-                        _r.Image.BeginInit();
-                        _r.Image.UriSource = new Uri(_uriImage);
-                        _r.Image.EndInit();
+                        // Temporary disabled
+                        //_r.Image = await AnimepaheExtractor.GetImage(_uriImage);
 
                         SearchResultsStackPanel.Children.Add(_r);
                     }

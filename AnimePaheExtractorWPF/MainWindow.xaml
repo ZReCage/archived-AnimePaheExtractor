@@ -6,107 +6,207 @@
         xmlns:local="clr-namespace:AnimePaheExtractorWPF"
         mc:Ignorable="d"
         Closing="DataWindow_Closing"
-        Title="AnimePahe Extractor 0.0.3 - c0dename 'GarbageCollector'" Height="450" Width="800" Background="Transparent" Foreground="#00000000" BorderBrush="Red">
+        Title="AnimePahe Extractor 0.0.3 - c0dename 'GarbageCollector'" Height="450" Width="800" MinHeight="450" MinWidth="800" Background="Transparent" Foreground="#00000000" BorderBrush="Red">
     <Window.Resources>
+        <Style TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="#373737" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
 
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border CornerRadius="4" Background="{TemplateBinding Background}">
+                            <Grid>
+                                <ContentPresenter x:Name="MyContentPresenter" Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,0" />
+                            </Grid>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#F7005E" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#E7015B" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="{x:Type RadioButton}" >
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type RadioButton}">
+                        <BulletDecorator Cursor="Hand">
+                            <BulletDecorator.Bullet>
+                                <Grid Height="16" Width="16">
+                                    <Border Name="RadioOuter" Background="Transparent" BorderBrush="Gainsboro" BorderThickness="1" CornerRadius="3" />
+                                    <Border CornerRadius="3" Margin="4" Name="RadioMark" Background="#F7005E" Visibility="Hidden" />
+                                </Grid>
+                            </BulletDecorator.Bullet>
+                            <ContentPresenter Margin="8, 0, 0, 0"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Left"
+                                RecognizesAccessKey="True" />
+                        </BulletDecorator>
+                      <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="true">
+                                <Setter TargetName="RadioMark" Property="Visibility" Value="Visible"/>
+                                <Setter TargetName="RadioOuter" Property="BorderBrush" Value="#E7015B" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="TextBox">
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="CaretBrush" Value="#FFC1D9" />
+            <Setter Property="Padding" Value="5" />
+            <Setter Property="Margin" Value="5" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TextBox}">
+                        <Border x:Name="border"
+                            CornerRadius="2"
+                            BorderBrush="#FFAD0042"
+                            BorderThickness="2"
+                            Background="#0000" >
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                Focusable="false"
+                                HorizontalScrollBarVisibility="Hidden"
+                                VerticalScrollBarVisibility="Hidden" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="BorderBrush" TargetName="border" Value="#909090"/>
+                            </Trigger>
+                            <Trigger Property="IsFocused" Value="true">
+                                <Setter Property="BorderBrush" TargetName="border" Value="#E7015B"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
     </Window.Resources>
-
+    
     <Border BorderThickness="5">
         <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="33*"/>
-                <ColumnDefinition Width="46*"/>
-            </Grid.ColumnDefinitions>
-            <Grid.Background>
-                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                    <GradientStop Color="Black"/>
-                    <GradientStop Color="#00292929" Offset="1"/>
-                </LinearGradientBrush>
-            </Grid.Background>
-            <Grid.OpacityMask>
-                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                    <GradientStop Color="Black"/>
-                    <GradientStop Color="#FF212121" Offset="1"/>
-                </LinearGradientBrush>
-            </Grid.OpacityMask>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="16"/>
+            </Grid.RowDefinitions>
+            <Grid>                
+                <Grid.Background>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="Black"/>
+                        <GradientStop Color="#00292929" Offset="1"/>
+                    </LinearGradientBrush>
+                </Grid.Background>
+                <Grid.OpacityMask>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="Black"/>
+                        <GradientStop Color="#FF212121" Offset="1"/>
+                    </LinearGradientBrush>
+                </Grid.OpacityMask>
 
-
-            <TabControl
-                x:Name="MainMenuTabControl"
+                <TabControl
+                    x:Name="MainMenuTabControl"
                 
-                Background="{x:Null}"
-                BorderBrush="{x:Null}"
-                Foreground="{x:Null}"
-            
-                TabStripPlacement="Left" Grid.ColumnSpan="2"
-            >
-
-                <TabControl.Resources>
-                    <Style TargetType="TabItem">
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="TabItem">
-                                    <Grid Name="Panel">
-                                        <ContentPresenter x:Name="ContentSite"
-                                        VerticalAlignment="Center"
-                                        HorizontalAlignment="Center"
-                                        ContentSource="Header"
-                                        Margin="20,10"
+                    Background="{x:Null}"
+                    BorderBrush="{x:Null}"
+                    Foreground="{x:Null}"
+                >
+                    <TabControl.Resources>
+                        <Style TargetType="{x:Type TabPanel}">
+                            <Setter Property="HorizontalAlignment" Value="Center" />
+                        </Style>
+                        <Style TargetType="TabItem">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="TabItem">
+                                        <Grid Name="Panel">
+                                            <ContentPresenter x:Name="ContentSite"
+                                            ContentSource="Header"
+                                            VerticalAlignment="Center"
+                                            HorizontalAlignment="Center"
                                         />
-                                    </Grid>
-                                    <ControlTemplate.Triggers>
-                                        <Trigger Property="IsSelected" Value="True">
-                                            <Setter TargetName="Panel" Property="Background" Value="#99ABCDEF" />
-                                            <Setter Property="Foreground" Value="Black"/>
-                                        </Trigger>
-                                        <Trigger Property="IsSelected" Value="False">
-                                            <Setter TargetName="Panel" Property="Background" Value="Transparent" />
-                                            <Setter Property="Foreground" Value="White"/>
-                                        </Trigger>
+                                        </Grid>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="Panel" Property="Background" Value="#99ABCDEF" />
+                                                <Setter Property="Foreground" Value="Black"/>
+                                            </Trigger>
+                                            <Trigger Property="IsSelected" Value="False">
+                                                <Setter TargetName="Panel" Property="Background" Value="Transparent" />
+                                                <Setter Property="Foreground" Value="White"/>
+                                            </Trigger>
 
-                                    </ControlTemplate.Triggers>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </TabControl.Resources>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </TabControl.Resources>
 
-                <TabItem Header="Welcome" IsEnabled="False">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
+                    <TabItem Header="Welcome" IsEnabled="False" Width="196">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
 
-                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                            <TextBlock Text="Welcome to AnimePahe Extractor!" Foreground="White" FontSize="24"/>
-                            <TextBlock Text="alpha version" Foreground="White" FontSize="14" HorizontalAlignment="Center"/>
-                            <Separator />
-                            <Button Click="GoToSearch_Click" Content="Continue to Search Page" />
-                        </StackPanel>
+                            <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                <TextBlock Text="Welcome to AnimePahe Extractor!" Foreground="White" FontSize="32"/>
+                                <TextBlock Text="alpha version" Foreground="White" FontSize="14" HorizontalAlignment="Center"/>
+                                <Separator Margin="0, 8, 0, 24"/>
+                                <Button x:Name="ContinueToSearch" Margin="32, 0, 32, 0" Click="GoToSearch_Click" Content="Continue to Search tab" Height="24"/>
+                            </StackPanel>
 
-                        <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Right">
-                            <TextBlock Text="Powered by " Foreground="White" FontSize="14"/>
-                            <TextBlock Text="ZReC" FontSize="24" FontWeight="Bold">
-                                <TextBlock.Foreground>
-                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                        <GradientStop Color="#FF9E0000"/>
-                                        <GradientStop Color="#FFDC0C0C" Offset="1"/>
-                                    </LinearGradientBrush>
-                                </TextBlock.Foreground>
-                            </TextBlock>
-                        </StackPanel>
-                    </Grid>
-                </TabItem>
+                            <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Right">
+                                <TextBlock Text="Powered by " Foreground="White" FontSize="14"/>
+                                <TextBlock Text="ZReC" FontSize="24" FontWeight="Bold">
+                                    <TextBlock.Foreground>
+                                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                            <GradientStop Color="#FF9E0000"/>
+                                            <GradientStop Color="#FFDC0C0C" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </TextBlock.Foreground>
+                                </TextBlock>
+                            </StackPanel>
+                        </Grid>
+                    </TabItem>
 
-                <TabItem x:Name="SearchTabItem" Header="Search">
-                    <local:SearchMenu/>
-                </TabItem>
+                    <TabItem x:Name="SearchTabItem" Header="Search" IsEnabled="False" Width="196">
+                        <local:SearchMenu/>
+                    </TabItem>
 
-                <TabItem x:Name="ExtractTabItem" Header="Extract" IsEnabled="False">
-                </TabItem>
+                    <TabItem x:Name="ExtractTabItem" Header="Extract" IsEnabled="False" Width="196">
+                    </TabItem>
 
-            </TabControl>
+                </TabControl>
+            </Grid>
+
+            <Separator Grid.Row="1">
+                <Separator.Background>
+                    <RadialGradientBrush>
+                        <GradientStop Color="#00000000" Offset="1"/>
+                        <GradientStop Color="White" Offset="0"/>
+                    </RadialGradientBrush>
+                </Separator.Background>
+            </Separator>
+
+            <TextBlock Grid.Row="2" Text="{Binding Path=StatusBar, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=I want some ice cream}" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White" Height="16" TextTrimming="CharacterEllipsis"/>
         </Grid>
     </Border>
 </Window>

@@ -9,13 +9,12 @@ namespace AnimePaheExtractorWPF
     /// </summary>
     public partial class SearchResult : UserControl
     {
-        private SearchResultComponentModel searchResultCM = null;
+        private readonly SearchResultComponentModel searchResultCM = new SearchResultComponentModel();
         public SearchResult()
         {
             InitializeComponent();
 
-            searchResultCM = new SearchResultComponentModel();
-            this.DataContext = searchResultCM;
+            DataContext = searchResultCM;
         }
 
         public string Id

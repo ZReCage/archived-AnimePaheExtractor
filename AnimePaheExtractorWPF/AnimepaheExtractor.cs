@@ -7,64 +7,69 @@ using PuppeteerSharp;
 using System;
 using Newtonsoft.Json.Linq;
 using System.Linq;
+using System.Threading;
+using System.Text;
+using System.Diagnostics;
+using System.Windows.Media.Imaging;
 
 namespace AnimePaheExtractorWPF
 {
     class AnimepaheExtractor
     {
         static Browser DefaultBrowser = null;
-        static bool InitializingPuppeteer = false;
         static Page CurrentPage;
+        static bool InitializingPuppeteer;
 
-        public static void InitializePuppeteer(Extract _extract)
+        public static bool InitializePuppeteer()
         {
-            if (DefaultBrowser != null && DefaultBrowser.IsClosed)
+            if (!InitializingPuppeteer)
             {
-                DefaultBrowser.Dispose();
-                DefaultBrowser = null;
-            }
 
-            if (DefaultBrowser == null)
-            {
-                if (InitializingPuppeteer)
-                    return;
-
-                InitializingPuppeteer = true;
-
-
-                _ = Task.Factory.StartNew(async () =>
+                if (DefaultBrowser != null && DefaultBrowser.IsClosed)
                 {
+                    DefaultBrowser.Dispose();
+                    DefaultBrowser = null;
+                }
+
+                if (DefaultBrowser == null)
+                {
+                    InitializingPuppeteer = true;
+
                     try
                     {
-                        SetStatusBar(_extract, ExtractComponentModel.StatusBarEnum.PreparingChromium);
+                        MainWindow.mainWindowCM.SetStatusBar(MainWindowComponentModel.StatusBarEnum.PreparingChromium);
 
-                        RevisionInfo _revisionInfo = await new BrowserFetcher().DownloadAsync(BrowserFetcher.DefaultRevision);
+                        RevisionInfo _revisionInfo = new BrowserFetcher().DownloadAsync(BrowserFetcher.DefaultRevision).Result;
 
                         if (_revisionInfo.Downloaded)
                         {
-                            SetStatusBar(_extract, ExtractComponentModel.StatusBarEnum.Launching);
-                            _extract.IsEnableable = true;
+                            MainWindow.mainWindowCM.SetStatusBar(MainWindowComponentModel.StatusBarEnum.Launching);
 
+                            DefaultBrowser = Puppeteer.LaunchAsync(new LaunchOptions
+                            {
+                                Headless = false
+                            }).Result;
+
+                            IList<Page> _p = DefaultBrowser.PagesAsync().Result;
+                            CurrentPage = _p[0];
+
+                            MainWindow.mainWindowCM.SetStatusBar(MainWindowComponentModel.StatusBarEnum.Ready);
+                            return true;
                         }
                         else
-                            SetStatusBar(_extract, ExtractComponentModel.StatusBarEnum.Error);
-
-                        DefaultBrowser = await Puppeteer.LaunchAsync(new LaunchOptions
                         {
-                            Headless = false
-                        });
-
-                        IList<Page> _p = await DefaultBrowser.PagesAsync();
-                        CurrentPage = _p[0];
-
-                        SetStatusBar(_extract, ExtractComponentModel.StatusBarEnum.Ready);
-
+                            MainWindow.mainWindowCM.SetStatusBar(MainWindowComponentModel.StatusBarEnum.Error);
+                            return false;
+                        }
                     }
-                    catch { }
-                });
-            }
+                    catch {
+                        MainWindow.mainWindowCM.SetStatusBar(MainWindowComponentModel.StatusBarEnum.Error);
+                    }
 
-            InitializingPuppeteer = false;
+                    InitializingPuppeteer = false;
+                }
+            }
+            return true;
         }
 
         public static void FinishPuppeteer()
@@ -74,11 +79,6 @@ namespace AnimePaheExtractorWPF
                 DefaultBrowser.Dispose();
                 DefaultBrowser = null;
             }
-        }
-
-        public static async void SetStatusBar(Extract _extract, ExtractComponentModel.StatusBarEnum _statusBarEnum)
-        {
-            await Task.Factory.StartNew(() => _extract.ExtractCM.StatusEnum = _statusBarEnum);
         }
 
         public static async Task<string> GetUrlToExtract(string serverUrl)
@@ -146,8 +146,14 @@ namespace AnimePaheExtractorWPF
 
             string uri = "https://animepahe.com/api?m=search&l=8&q=" + query.Substring(0, query.Length > 32 ? 32 : query.Length);
 
-            string _json = await GetRequest(uri);
-            return JsonConvert.DeserializeObject<SearchResults>(_json);
+            string _json = await GetJSON(uri);
+            //string _json = await GetRequest(uri);
+
+            // Checks _json
+            if (_json.Length > 0)
+                return JsonConvert.DeserializeObject<SearchResults>(_json);
+            else
+                return new SearchResults();
         }
 
         public static async Task<IList<Episode>> GetEpisodesList(int _serieId, Range _range)
@@ -161,7 +167,7 @@ namespace AnimePaheExtractorWPF
             {
                 string uri = "https://animepahe.com/" + $"api?m=release&id={_serieId}&sort=episode_asc" + $"&page={actualPage}";
 
-                string _request = await GetRequest(uri);
+                string _request = await GetJSON(uri);
 
                 JObject jsonObject = JObject.Parse(_request);
                 if (lastPage == null)
@@ -192,7 +198,7 @@ namespace AnimePaheExtractorWPF
         {
             // Request
             string uri = "https://animepahe.com/api?m=embed&p=kwik" + $"&id={serieId}" + $"&session={session}";
-            string _request = await GetRequest(uri);
+            string _request = await GetJSON(uri);
 
             try
             {
@@ -226,16 +232,109 @@ namespace AnimePaheExtractorWPF
             }
         }
 
+        public static async Task<string> GetJSON(string uri)
+        {
+            // Makes sure Puppeteer is OK
+            InitializePuppeteer();
+
+            Page _tmpPage = await DefaultBrowser.NewPageAsync();
+            Response response = await _tmpPage.GoToAsync(uri);
+            // This block waits until there's no title, a sign that the json was loaded
+            string title = string.Empty;
+            do
+            {
+                Thread.Sleep(500);
+                try
+                {
+                    title = await _tmpPage.GetTitleAsync();
+                }
+                catch (EvaluationFailedException e)
+                {
+#if DEBUG
+                    Debug.WriteLine(e.Message);
+#endif
+                    response = await _tmpPage.ReloadAsync();
+                }
+            } while (title != string.Empty);
+
+            // Get response's buffer, encodes as string
+            byte[] buffer = await response.BufferAsync();
+
+            // Temp page closes
+            await _tmpPage.CloseAsync();
+
+            return Encoding.UTF8.GetString(buffer);
+        }
+
+        public static async Task<BitmapImage> GetImage(string uri)
+        {
+            // Makes sure Puppeteer is OK
+            InitializePuppeteer();
+
+            Page _tmpPage = await DefaultBrowser.NewPageAsync();
+            Response response = await _tmpPage.GoToAsync(uri);
+
+            // The image title should contain one of these
+            IList<string> fileTypes = new List<string> { ".jpg", ".png", ".bmp", ".gif" };
+
+            // This block waits until the title matches the condition
+            string title = string.Empty;
+            do
+            {
+                Thread.Sleep(500);
+                try
+                {
+                    title = await _tmpPage.GetTitleAsync();
+                }
+                catch (EvaluationFailedException e)
+                {
+#if DEBUG
+                    Debug.WriteLine(e.Message);
+#endif
+                    response = await _tmpPage.ReloadAsync();
+                }
+                catch (NullReferenceException e)
+                {
+#if DEBUG
+                    Debug.WriteLine(e.Message);
+#endif
+                    // F
+                }
+            } while (!fileTypes.Any(s => title.Contains(s)));
+
+            // Gets response's buffer, encodes as bitmap (No tested yet)
+            byte[] buffer = await response.BufferAsync();
+            BitmapImage _bitmap = new BitmapImage();
+            _bitmap.BeginInit();
+            using (var mStream = new MemoryStream(buffer))
+            {
+                _bitmap.StreamSource = mStream;
+            }
+            _bitmap.EndInit();
+
+            // Temp page closes
+            await _tmpPage.CloseAsync();
+
+            return _bitmap;
+        }
+
         public static async Task<string> GetRequest(string uri)
         {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
-            request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+            try { 
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
+                request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
 
-            using (HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync())
-            using (Stream stream = response.GetResponseStream())
-            using (StreamReader reader = new StreamReader(stream))
+                using (HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync())
+                using (Stream stream = response.GetResponseStream())
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    return await reader.ReadToEndAsync();
+                }
+            }
+            catch
             {
-                return await reader.ReadToEndAsync();
+                // Exception occurred
+                return "";
             }
         }
     }

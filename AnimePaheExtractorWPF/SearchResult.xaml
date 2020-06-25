@@ -8,7 +8,37 @@
              d:DesignHeight="140" d:DesignWidth="400" Foreground="#00000000">
 
     <StackPanel>
-        <Border BorderThickness="3">
+        <StackPanel.Resources>
+            <Style TargetType="{x:Type Button}">
+                <Setter Property="Background" Value="#22FFFFFF" />
+                <Setter Property="Foreground" Value="White" />
+                <Setter Property="FontSize" Value="15" />
+                <Setter Property="SnapsToDevicePixels" Value="True" />
+
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Button}">
+                            <Border CornerRadius="4" Background="{TemplateBinding Background}" >
+                                <Grid>
+                                    <ContentPresenter x:Name="MyContentPresenter2" Content="{TemplateBinding Content}" />
+                                </Grid>
+                            </Border>
+
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#22F7005E" />
+                                </Trigger>
+
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter Property="Background" Value="#22E7015B" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </StackPanel.Resources>
+        <Border BorderThickness="3" CornerRadius="4">
             <Border.BorderBrush>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                     <GradientStop Color="#FFD5015B" Offset="0.671"/>
@@ -16,17 +46,12 @@
                 </LinearGradientBrush>
             </Border.BorderBrush>
             <Button
-                        x:Name="SearchResultDropDown"
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Stretch"
-                        HorizontalContentAlignment="Left"
-                        VerticalContentAlignment="Center"
-                        
-                        
-                        Background="#19DDDDDD"
-                        BorderBrush="Transparent"
-                        Foreground="{x:Null}"
-                        InputScope="Xml" ClickMode="Press" >
+                x:Name="SearchResultDropDown"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                HorizontalContentAlignment="Left"
+                VerticalContentAlignment="Center"
+                InputScope="Xml" ClickMode="Press" >
                 <Border BorderThickness="2">
                     <Grid>
                         <Grid.RowDefinitions>
@@ -73,49 +98,39 @@
 
         <Grid Margin="5 5 5 0" x:Name="ExtractOptions" Visibility="Collapsed">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*" />
                 <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            
+            <Grid.Resources>
+                <Style TargetType="TextBlock">
+                    <Setter Property="Foreground" Value="White" />
+                </Style>
+            </Grid.Resources>
             <StackPanel>
                 <RadioButton
                     x:Name="ExtractAllRadioButton"
                     IsChecked="True"
-                    Content="Extract all episodes"
-                    Foreground="White"
                 
-                    Margin="0 0 0 5"/>
+                    Margin="0 0 0 5">
+                    <TextBlock Text="Extract all episodes" />
+                </RadioButton>
 
                 <RadioButton
                     x:Name="ExtractRangeRadioButton"
-                    VerticalAlignment="Center"
-                    Margin="0 0 0 0" >
-                    <StackPanel>
-                        <TextBlock
-                                Text="Extract a range of episodes"
-                                Foreground="White"
-                        
-                                VerticalAlignment="Center"
-                                Margin="0 0 0 5" />
+                    VerticalAlignment="Center" Margin="0, 0, 0, 32">
+                    <StackPanel Margin="0, 8, 0, -32">
+                        <TextBlock Text="Extract a range of episodes"/>
 
                         <StackPanel
                                 Grid.Row="1"
                                 Orientation="Horizontal" >
-                            <TextBlock
-                                    Text="From: "
-                                    Foreground="White"
-                            
-                                    VerticalAlignment="Center"
-                                    Margin="5 0 0 0" />
-                            <TextBox x:Name="FromTextBox" Text="1" HorizontalAlignment="Left" VerticalAlignment="Top" Width="30" />
+                            <TextBlock Margin="0, 8, 0, 0"
+                                    Text="From: " FontSize="16" />
+                            <TextBox x:Name="FromTextBox" Text="1" HorizontalAlignment="Left" VerticalAlignment="Top" Width="38" />
 
-                            <TextBlock
-                                    Text="To: "
-                                    Foreground="White"
-                            
-                                    VerticalAlignment="Center"
-                                    Margin="5 0 0 0" />
-                            <TextBox x:Name="ToTextBox" HorizontalAlignment="Left" VerticalAlignment="Top" Width="30"/>
+                            <TextBlock Margin="0, 8, 0, 0"
+                                    Text="To: " FontSize="16" />
+                            <TextBox x:Name="ToTextBox" HorizontalAlignment="Left" VerticalAlignment="Top" Width="38"/>
                         </StackPanel>
                     </StackPanel>
                 </RadioButton>
@@ -126,7 +141,7 @@
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center">
                 <Button x:Name="StartExtraction">
-                    <TextBlock Text="Start Extraction" Margin="5 5 5 5" />
+                    <TextBlock Text="Start Extraction" Margin="8 16 8 16" />
                 </Button>
             </StackPanel>
         </Grid>

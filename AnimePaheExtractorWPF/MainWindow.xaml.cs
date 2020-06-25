@@ -1,35 +1,37 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace AnimePaheExtractorWPF
 {
     public partial class MainWindow : Window
     {
-        static MainWindow _mainWindow;
-        private static Extract Extract = null;
+        public static MainWindow _mainWindow;
+        public static MainWindowComponentModel mainWindowCM = new MainWindowComponentModel();
+        public static Extract DefExtract = null;
 
         public MainWindow()
         {
+            DataContext = mainWindowCM;
+            
             _mainWindow = this;
             InitializeComponent();
         }
 
         public static async void ReadyToExtract(Serie _serie, Range _range = null)
         {
-            MainWindow.IsSearchTabEnabled = false;
             AnimePaheExtractorWPF.Extract.CurrentSerie = _serie;
 
-            Extract = new Extract();
-            _mainWindow.ExtractTabItem.Content = Extract;
+            DefExtract = new Extract();
+            _mainWindow.ExtractTabItem.Content = DefExtract;
 
             _mainWindow.MainMenuTabControl.SelectedIndex = 2;
 
-            AnimepaheExtractor.InitializePuppeteer(Extract);
+            // Bring puppeteer to life, from the nothing it's become
+            AnimepaheExtractor.InitializePuppeteer();
 
             IList<Episode> _episodes = await AnimepaheExtractor.GetEpisodesList(Extract.CurrentSerie.Id, _range);
-
-            /////////////////////////////////////////Extract.CurrentExtractListViewItems = new List<ExtractListViewItem>();
 
             foreach (Episode _episode in _episodes)
             {
@@ -48,28 +50,23 @@ namespace AnimePaheExtractorWPF
                         Episode = _episode
                     };
 
-                    //////////////////////////////////////////////Extract.CurrentExtractListViewItems.Add(_item);
-                    Extract.ExtractsGrid.DataContext = _item;
+                    DefExtract.ExtractsGrid.DataContext = _item;
 
-                    Extract.ExtractsGrid.Items.Add(_item);
+                    DefExtract.ExtractsGrid.Items.Add(_item);
 
-                    Extract.ExtractsGrid_AddItem(_item);
+                    DefExtract.ExtractsGrid_AddItem(_item);
                 }
             }
+
+            // After gathering all episodes, extract could start
+            DefExtract.AllEpisodesReadyToExtract = true;
         }
 
-        public static bool IsSearchTabEnabled
+        private async void GoToSearch_Click(object sender, RoutedEventArgs e)
         {
-            get { return _mainWindow.SearchTabItem.IsEnabled; }
-            set
-            {
-                _mainWindow.SearchTabItem.IsEnabled = value;
-            }
-        }
-
-        private void GoToSearch_Click(object sender, RoutedEventArgs e)
-        {
-            SearchTabItem.IsSelected = true;
+            ContinueToSearch.IsEnabled = false;
+            SearchTabItem.IsSelected = await Task.Run(() => AnimepaheExtractor.InitializePuppeteer());
+            ContinueToSearch.IsEnabled = true;
         }
 
         void DataWindow_Closing(object sender, CancelEventArgs e)
@@ -78,10 +75,12 @@ namespace AnimePaheExtractorWPF
             { // Try to destroy everything
                 AnimepaheExtractor.FinishPuppeteer();
 
-                if (Extract != null && Extract.Downloader != null)
+                if (DefExtract != null && DefExtract.Downloader != null)
                 {
-                    Extract.Downloader.StopDownload();
-                    Extract.Downloader.dThread.Abort();
+                    DefExtract.Downloader.StopDownload();
+
+                    if(DefExtract.Downloader.dThread != null)
+                        DefExtract.Downloader.dThread.Abort();
                 }
             }
             catch { }
@@ -90,6 +89,7 @@ namespace AnimePaheExtractorWPF
             System.Environment.Exit(1);
         }
     }
+
     public class ExtractGridItem : INotifyPropertyChanged
     {
         public double EpisodeNumber { get; set; }
@@ -151,14 +151,9 @@ namespace AnimePaheExtractorWPF
         public Episode Episode;
 
         public event PropertyChangedEventHandler PropertyChanged;
-
-        protected void OnPropertyChanged(string name)
+        private void OnPropertyChanged(string propertyName = "")
         {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null)
-            {
-                handler(this, new PropertyChangedEventArgs(name));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 
