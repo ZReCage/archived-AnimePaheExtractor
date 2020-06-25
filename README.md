@@ -19,6 +19,8 @@ Coded like my first Hello World! Unstable as a teenager.
 - Do not abuse, animepahe is a thousand times better. There is no comment section, and that's what I love the most.
 - Fork and do better, I demand justice against my acts.
 
+It will extract everything in the program's root folder, inside a subfolder named like the series title
+
 ## Thoughts
 I did (and do) this in a rush, so you should expect as many bad practices as you never saw before. I'm aware of it.
 
