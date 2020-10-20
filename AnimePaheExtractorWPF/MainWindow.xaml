@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:AnimePaheExtractorWPF"
         mc:Ignorable="d"
         Closing="DataWindow_Closing"
-        Title="AnimePahe Extractor 0.1.0 - c0dename 'ShouldNotExist'" Height="450" Width="800" MinHeight="450" MinWidth="800" Background="Transparent" Foreground="#00000000" BorderBrush="Red">
+        Title="AnimePahe Extractor 0.2.0 - c0dename 'TheNastyUndead'" Height="450" Width="800" MinHeight="450" MinWidth="800" Background="Transparent" Foreground="#00000000" BorderBrush="Red">
     <Window.Resources>
         <Style TargetType="{x:Type Button}">
             <Setter Property="Background" Value="#373737" />
