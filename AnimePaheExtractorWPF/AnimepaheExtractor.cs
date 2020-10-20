@@ -47,11 +47,21 @@ namespace AnimePaheExtractorWPF
 
                             DefaultBrowser = Puppeteer.LaunchAsync(new LaunchOptions
                             {
-                                Headless = false
+                                Args = new string[] { "--disable-blink-features", "--disable-blink-features=AutomationControlled" },                                IgnoredDefaultArgs = new string[] { "--enable-automation", "--headless" },
+                                IgnoreHTTPSErrors = true,
+                                UserDataDir = "./tmp",
                             }).Result;
+
 
                             IList<Page> _p = DefaultBrowser.PagesAsync().Result;
                             CurrentPage = _p[0];
+
+                            if(File.Exists("./cookies.json"))
+                            {
+                                // If they exist, load cookies
+                                string _cookies = File.ReadAllText("./cookies.json");
+                                CurrentPage.SetCookieAsync(JsonConvert.DeserializeObject<CookieParam[]>(_cookies));
+                            }
 
                             MainWindow.mainWindowCM.SetStatusBar(MainWindowComponentModel.StatusBarEnum.Ready);
                             return true;
@@ -96,6 +106,10 @@ namespace AnimePaheExtractorWPF
                 {
                     try
                     {
+                        // Save cookies
+                        CookieParam[] _cookies = await CurrentPage.GetCookiesAsync();
+                        File.WriteAllText("./cookies.json", JsonConvert.SerializeObject(_cookies));
+
                         await e.Request.AbortAsync();
                         CurrentPage.Request -= _request;
                         await CurrentPage.GoToAsync("about:blank");
@@ -232,13 +246,13 @@ namespace AnimePaheExtractorWPF
             }
         }
 
-        public static async Task<string> GetJSON(string uri)
+        public static async Task<string> GetJSON(string url)
         {
             // Makes sure Puppeteer is OK
             InitializePuppeteer();
 
             Page _tmpPage = await DefaultBrowser.NewPageAsync();
-            Response response = await _tmpPage.GoToAsync(uri);
+            Response response = await _tmpPage.GoToAsync(url);
             // This block waits until there's no title, a sign that the json was loaded
             string title = string.Empty;
             do
@@ -248,10 +262,14 @@ namespace AnimePaheExtractorWPF
                 {
                     title = await _tmpPage.GetTitleAsync();
                 }
+#if DEBUG
+                catch (Exception e)
+                {
+
+                    Debug.WriteLine(e.Message);
+#else
                 catch
                 {
-#if DEBUG
-                    Debug.WriteLine(e.Message);
 #endif
                     response = await _tmpPage.ReloadAsync();
                 }
@@ -266,13 +284,13 @@ namespace AnimePaheExtractorWPF
             return Encoding.UTF8.GetString(buffer);
         }
 
-        public static async Task<BitmapImage> GetImage(string uri)
+        public static async Task<BitmapImage> GetImage(string url)
         {
             // Makes sure Puppeteer is OK
             InitializePuppeteer();
 
             Page _tmpPage = await DefaultBrowser.NewPageAsync();
-            Response response = await _tmpPage.GoToAsync(uri);
+            Response response = await _tmpPage.GoToAsync(url);
 
             // The image title should contain one of these
             IList<string> fileTypes = new List<string> { ".jpg", ".png", ".bmp", ".gif" };
@@ -286,10 +304,14 @@ namespace AnimePaheExtractorWPF
                 {
                     title = await _tmpPage.GetTitleAsync();
                 }
+#if DEBUG
+                catch (Exception e)
+                {
+
+                    Debug.WriteLine(e.Message);
+#else
                 catch
                 {
-#if DEBUG
-                    Debug.WriteLine(e.Message);
 #endif
                     response = await _tmpPage.ReloadAsync();
                 }
