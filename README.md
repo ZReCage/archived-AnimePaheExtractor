@@ -1,4 +1,4 @@
-# AnimePaheExtractor
+# AnimePaheExtractor (please read last paragraph)
 Coded like my first Hello World! Unstable as a teenager.
 > *It's not like I wanna be stable or anything.*
 
@@ -28,3 +28,5 @@ In the end, this ugly app is made for fun, I do not approve such an abomination 
 Go to support animepahe or, even better, pay for the content you watch, if you can afford it (there is content that isn't for sale, I know).
 
 Have fun!.. main(args : Array<String>) { println("I'm learning Kotlin (´・ω・｀)\nHaha #comedy") }
+
+> **This repo is outdated, I'll be working to improve / port the project (^///^)**
