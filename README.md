@@ -1,8 +1,8 @@
 # This repo is outdated, you may want to check the [new version](../../../AnimePaheXtractor/) (^///^)
 
-# AnimePaheExtractor
-
 ---
+
+# AnimePaheExtractor
 
 Coded like my first Hello World! Unstable as a teenager.
 > *It's not like I wanna be stable or anything.*
